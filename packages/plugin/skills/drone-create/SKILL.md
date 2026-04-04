@@ -1,11 +1,9 @@
 ---
 name: drone-create
-description: Use when the user wants to create a custom drone for Mission Control, build a new drone, or extend the framework with new capabilities
+description: Use when the user wants to create, build, or add a custom drone for Mission Control, or asks to extend the framework with new automation capabilities
 ---
 
 # Create a Custom Drone
-
-Build a new drone for Mission Control. Scaffolds the files, then customizes them based on the user's requirements.
 
 ## How to Run Commands
 
@@ -15,95 +13,136 @@ MISSION="bash ${CLAUDE_PLUGIN_ROOT}/bin/mission"
 
 **NEVER:** `npx mission`, `node .../bin/mission`, `mission` directly.
 
-## Step 1: Understand What the User Wants
+## Decide: Tool or AI?
 
-Ask if not clear:
-- What should this drone do?
-- Is it a **tool drone** (runs a CLI command, no AI needed) or an **AI drone** (needs LLM reasoning)?
-- What keywords should trigger it?
-- What priority? (higher = runs earlier. scout=100, coder=50, reviewer=10)
+```dot
+digraph drone_type {
+    "Does it need LLM reasoning?" [shape=diamond];
+    "Tool drone" [shape=box];
+    "AI drone" [shape=box];
+    "Does it also run a command first?" [shape=diamond];
+    "Hybrid (tool + AI skill)" [shape=box];
 
-## Step 2: Scaffold
+    "Does it need LLM reasoning?" -> "Tool drone" [label="no — runs a command"];
+    "Does it need LLM reasoning?" -> "Does it also run a command first?" [label="yes"];
+    "Does it also run a command first?" -> "Hybrid (tool + AI skill)" [label="yes"];
+    "Does it also run a command first?" -> "AI drone" [label="no"];
+}
+```
+
+| Type | Needs | Examples |
+|------|-------|---------|
+| **Tool** | Shell command + executor class | linter, formatter, dep-check, bundle-size |
+| **AI** | Skill markdown only | code-reviewer, api-designer, refactorer |
+| **Hybrid** | Both | test-analyzer (runs tests, then AI explains failures) |
+
+## Step 1: Scaffold
 
 ```bash
 $MISSION drone create <name>
 ```
 
-This creates:
-```
-<name>/
-├── drone.yaml          # Manifest — triggers, signals, priority
-├── skills/main.md      # AI drone behavior instructions
-├── tests/drone.test.ts # Test suite
-├── package.json        # npm package config
-└── README.md           # Documentation
-```
+Creates: `drone.yaml`, `skills/main.md`, `tests/drone.test.ts`, `package.json`, `README.md`
 
-## Step 3: Customize the Manifest
+## Step 2: Edit drone.yaml
 
-Edit `<name>/drone.yaml` based on user's requirements:
+The manifest controls when and how the drone activates. Edit every field — don't leave defaults.
 
 ```yaml
-name: <name>
-description: <what it does — one line>
+name: lint-check
+description: Runs ESLint and reports code quality issues
 
 triggers:
   keywords:
-    - <word that activates this drone>
-    - <another trigger word>
-  # taskSize: large        # uncomment to only activate on large tasks
+    - lint
+    - eslint
+    - code quality
 
 opinions:
-  requires: []              # things this drone insists on
-  suggests: []              # things it recommends
-  blocks: []                # things it prevents
+  requires: []
+  suggests:
+    - fix lint warnings before merging
+  blocks: []
 
 signals:
   emits:
-    - <name>.done
+    - lint-check.done
   listens:
-    - scout.done            # wait for scout to finish first
+    - coder.done       # run after coder finishes
 
-priority: 50                # 0-100, higher = runs earlier
+priority: 35            # after coder(50), before reviewer(10)
 escalation: user
 ```
 
-## Step 4: Write the Skill (AI drones only)
+## Step 3: Write the Skill (AI and hybrid drones)
 
-Edit `<name>/skills/main.md` with specific instructions for what the drone should do. This is what Claude reads when acting as this drone.
+Edit `<name>/skills/main.md`. This is what Claude reads when acting as this drone.
 
-Good skills include:
-- Clear step-by-step process
-- What files to read for context
-- What output to produce
-- Where to write results (`.mctl/mission/<name>.md`)
+**Every AI drone skill MUST include:**
+1. What to read: `Read .mctl/mission/scout.json for project context`
+2. What to do: step-by-step instructions
+3. Where to write output: `Write results to .mctl/mission/<name>.md`
+4. What to report back: one-line status
 
-## Step 5: Write Tests
+**Example skill for a code-review drone:**
+```markdown
+# Code Review Drone
 
-Edit `<name>/tests/drone.test.ts` to verify:
-- Manifest is valid
-- Keywords trigger correctly
-- Signals are declared
-
-Run tests:
-```bash
-cd <name> && npx vitest run
+1. Read .mctl/mission/scout.json for project structure
+2. Read .mctl/mission/coder.md to see what was changed
+3. Run `git diff HEAD~3` to see actual changes
+4. Review for: correctness, edge cases, security, naming, patterns
+5. Write findings to .mctl/mission/code-review.md
+6. Report: "Review complete — N issues found" or "Review complete — clean"
 ```
 
-## Step 6: Install the Drone
+## Step 4: Create Executor (tool drones only)
 
-To use the drone in this project:
-```bash
-# Copy to project's drone directory (future: mission drone add <path>)
-cp -r <name>/ .mctl/drones/<name>/
+Tool drones need a TypeScript executor class. Create at `packages/core/src/drones/executors/<name>-executor.ts`:
+
+```typescript
+import { execSync } from 'child_process';
+import type { DroneResult } from '../drone-runner.js';
+
+export class LintCheckExecutor {
+  constructor(private projectDir: string) {}
+
+  async execute(): Promise<DroneResult & { issues: number; output: string }> {
+    try {
+      const output = execSync('npx eslint . --format json', {
+        cwd: this.projectDir, encoding: 'utf-8',
+        timeout: 30000, stdio: ['pipe', 'pipe', 'pipe'],
+      });
+      return { summary: 'Lint passed — no issues', issues: 0, output };
+    } catch (err) {
+      const e = err as { stdout?: string; status?: number };
+      return {
+        summary: `Lint found issues (exit ${e.status})`,
+        issues: e.status ?? 1,
+        output: (e.stdout ?? '').slice(-2000),
+      };
+    }
+  }
+}
 ```
 
-## Tool vs AI Drone Guide
+Then export from `packages/core/src/index.ts` and add to `packages/cli/src/commands/drone-exec.ts`.
 
-| Type | When to use | Example |
-|------|------------|---------|
-| **Tool** | Runs a shell command, parses output | linter, formatter, dep-check |
-| **AI** | Needs reasoning, writes code, makes decisions | code-reviewer, api-designer |
-| **Hybrid** | Runs a tool, then AI interprets results | test-analyzer (runs tests + explains failures) |
+## Step 5: Run Tests
 
-For tool drones, the user also needs to create an executor in `packages/core/src/drones/executors/` — guide them through this if needed.
+```bash
+cd <name> && pnpm exec vitest run
+```
+
+**NEVER:** `npx vitest run` (not in PATH at root level)
+
+## Common Mistakes
+
+| Mistake | Fix |
+|---------|-----|
+| Leaving default drone.yaml unchanged | Edit every field — name, description, triggers, signals, priority |
+| AI skill says "do your thing" | Write specific steps with exact file paths to read/write |
+| Forgetting `.mctl/mission/` output | Every drone must write its results to `.mctl/mission/<name>.md` |
+| Setting priority wrong | Higher = runs earlier. Match to dependency order. |
+| Not adding `listens` signals | If your drone depends on coder finishing, add `coder.done` to listens |
+| Using `npx vitest` | Use `pnpm exec vitest run` |
