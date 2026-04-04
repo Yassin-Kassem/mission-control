@@ -11,6 +11,7 @@ import { printDroneExec } from './commands/drone-exec.js';
 import { printMemory, promoteMemory, forgetMemory } from './commands/memory.js';
 import { printConfig } from './commands/config.js';
 import { printAnalysis } from './commands/analyze.js';
+import { printBudget } from './commands/budget.js';
 
 const program = new Command();
 
@@ -161,8 +162,17 @@ program
   .command('analyze')
   .description('Analyze a task and output structured plan (JSON)')
   .argument('<description>', 'Task description')
-  .action((description: string) => {
-    printAnalysis(description, process.cwd());
+  .option('--mode <mode>', 'Execution mode (autopilot|copilot|stepwise|blitz|solo)', 'copilot')
+  .action((description: string, options) => {
+    printAnalysis(description, process.cwd(), options.mode);
+  });
+
+program
+  .command('budget')
+  .description('Show token usage summary')
+  .argument('[dir]', 'Project directory', process.cwd())
+  .action((dir: string) => {
+    printBudget(dir);
   });
 
 program.parse();

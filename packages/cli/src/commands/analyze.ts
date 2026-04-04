@@ -5,6 +5,7 @@ const AI_DRONES = new Set(['architect', 'coder', 'reviewer', 'debugger', 'docs']
 
 export interface AnalysisResult {
   missionId: string;
+  mode: string;
   intent: string;
   scope: string;
   drones: { name: string; type: 'ai' | 'tool'; priority: number; reason: string }[];
@@ -18,7 +19,7 @@ export interface AnalysisResult {
   };
 }
 
-export function analyzeMission(description: string, projectDir: string): AnalysisResult {
+export function analyzeMission(description: string, projectDir: string, mode = 'copilot'): AnalysisResult {
   const ctx = loadProjectContext(projectDir);
   const profile = ctx.analyzer.analyze(description, projectDir);
   const missionId = createMissionId();
@@ -42,6 +43,7 @@ export function analyzeMission(description: string, projectDir: string): Analysi
 
   return {
     missionId,
+    mode,
     intent: profile.intent,
     scope: profile.scope,
     drones,
@@ -56,7 +58,7 @@ export function analyzeMission(description: string, projectDir: string): Analysi
   };
 }
 
-export function printAnalysis(description: string, projectDir: string): void {
-  const result = analyzeMission(description, projectDir);
+export function printAnalysis(description: string, projectDir: string, mode = 'copilot'): void {
+  const result = analyzeMission(description, projectDir, mode);
   console.log(JSON.stringify(result, null, 2));
 }
