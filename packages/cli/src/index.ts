@@ -12,6 +12,7 @@ import { printMemory, promoteMemory, forgetMemory } from './commands/memory.js';
 import { printConfig } from './commands/config.js';
 import { printAnalysis } from './commands/analyze.js';
 import { printBudget } from './commands/budget.js';
+import { rollbackMission as doRollback, printSnapshots } from './commands/rollback.js';
 
 const program = new Command();
 
@@ -173,6 +174,22 @@ program
   .argument('[dir]', 'Project directory', process.cwd())
   .action((dir: string) => {
     printBudget(dir);
+  });
+
+program
+  .command('rollback')
+  .description('Roll back to the state before a mission')
+  .argument('<mission-id>', 'Mission ID to roll back')
+  .action((missionId: string) => {
+    doRollback(missionId, process.cwd());
+    console.log(`Rolled back to pre-mission state: ${missionId}`);
+  });
+
+program
+  .command('snapshots')
+  .description('List available mission snapshots')
+  .action(() => {
+    printSnapshots(process.cwd());
   });
 
 program.parse();
