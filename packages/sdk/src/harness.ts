@@ -1,6 +1,6 @@
 import fs from 'fs';
 import path from 'path';
-import { parseDroneManifest, validateManifest, type DroneManifest, SignalBus, createSignal, type Signal } from '@mctl/core';
+import { parseDroneManifest, validateManifest, type DroneManifest, SignalBus, createSignal, type Signal } from '@missionctl/core';
 
 export class DroneTestHarness {
   readonly manifest: DroneManifest;

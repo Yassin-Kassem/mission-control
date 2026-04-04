@@ -1,4 +1,4 @@
-import { type Mission } from '@mctl/core';
+import { type Mission } from '@missionctl/core';
 import { loadProjectContext } from '../context.js';
 import { formatTimestamp } from '../format.js';
 import { banner, colors, table, trunc } from '../ui/theme.js';

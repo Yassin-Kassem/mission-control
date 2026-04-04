@@ -2,7 +2,7 @@ import { describe, it, expect, beforeEach, afterEach } from 'vitest';
 import { loadProjectContext } from '../src/context.js';
 import { addDrone } from '../src/commands/drone.js';
 import { initProject } from '../src/commands/init.js';
-import { scaffoldDrone } from '@mctl/sdk';
+import { scaffoldDrone } from '@missionctl/sdk';
 import fs from 'fs';
 import path from 'path';
 import os from 'os';

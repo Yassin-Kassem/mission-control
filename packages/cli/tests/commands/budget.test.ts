@@ -2,7 +2,7 @@ import { describe, it, expect, beforeEach, afterEach } from 'vitest';
 import { getMissionBudget } from '../../src/commands/budget.js';
 import { initProject } from '../../src/commands/init.js';
 import { loadProjectContext } from '../../src/context.js';
-import { createSignal } from '@mctl/core';
+import { createSignal } from '@missionctl/core';
 import fs from 'fs';
 import path from 'path';
 import os from 'os';

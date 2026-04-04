@@ -1,4 +1,4 @@
-import { createMissionId, SessionAdvisor, type ClaudePlan, type SessionAdvice } from '@mctl/core';
+import { createMissionId, SessionAdvisor, type ClaudePlan, type SessionAdvice } from '@missionctl/core';
 import { loadProjectContext } from '../context.js';
 import fs from 'fs';
 import path from 'path';

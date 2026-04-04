@@ -29,10 +29,10 @@ importers:
 
   packages/cli:
     dependencies:
-      '@mctl/core':
+      '@missionctl/core':
         specifier: workspace:*
         version: link:../core
-      '@mctl/sdk':
+      '@missionctl/sdk':
         specifier: workspace:*
         version: link:../sdk
       chalk:
@@ -82,7 +82,7 @@ importers:
 
   packages/sdk:
     dependencies:
-      '@mctl/core':
+      '@missionctl/core':
         specifier: workspace:*
         version: link:../core
       yaml:

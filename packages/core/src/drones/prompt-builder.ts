@@ -38,7 +38,7 @@ export class DronePromptBuilder {
       return {
         drone: manifest.name,
         type: 'tool',
-        command: `npx @mctl/cli drone exec ${manifest.name}`,
+        command: `npx @missionctl/cli drone exec ${manifest.name}`,
         inputs: manifest.inputs ?? [],
         outputs: manifest.outputs ?? [],
       };

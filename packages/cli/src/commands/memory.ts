@@ -1,4 +1,4 @@
-import { type MemoryEntry, type MemoryLayerName } from '@mctl/core';
+import { type MemoryEntry, type MemoryLayerName } from '@missionctl/core';
 import { loadProjectContext } from '../context.js';
 import { formatTimestamp } from '../format.js';
 import { header, colors, table } from '../ui/theme.js';

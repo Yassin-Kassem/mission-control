@@ -1,6 +1,6 @@
 import { describe, it, expect, beforeEach } from 'vitest';
 import { TerminalUI } from '../../src/ui/terminal-ui.js';
-import { SignalBus, createSignal } from '@mctl/core';
+import { SignalBus, createSignal } from '@missionctl/core';
 
 describe('TerminalUI', () => {
   let bus: SignalBus;

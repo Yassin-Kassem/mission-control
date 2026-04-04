@@ -1,5 +1,5 @@
 {
-  "name": "@mctl/sdk",
+  "name": "@missionctl/sdk",
   "version": "0.1.0",
   "description": "Mission Control Drone SDK — build, test, and share custom AI drones",
   "type": "module",
@@ -15,7 +15,7 @@
     "lint": "eslint src/"
   },
   "dependencies": {
-    "@mctl/core": "workspace:*",
+    "@missionctl/core": "workspace:*",
     "yaml": "^2.0.0"
   },
   "devDependencies": {

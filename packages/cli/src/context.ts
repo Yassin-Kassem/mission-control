@@ -3,7 +3,7 @@ import {
   MissionStore, MissionPlanner, CheckpointManager, ContextAnalyzer,
   DroneRegistry, type DroneManifest, parseDroneManifest,
   DronePromptBuilder, loadBuiltinDrones,
-} from '@mctl/core';
+} from '@missionctl/core';
 import path from 'path';
 import fs from 'fs';
 

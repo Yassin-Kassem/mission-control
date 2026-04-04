@@ -24,7 +24,7 @@ describe('DronePromptBuilder', () => {
     const manifest = makeManifest({ name: 'scout', type: 'tool' });
     const result = builder.buildPrompt(manifest, 'test task');
     expect(result.type).toBe('tool');
-    expect(result.command).toContain('npx @mctl/cli drone exec scout');
+    expect(result.command).toContain('npx @missionctl/cli drone exec scout');
     expect(result.prompt).toBeUndefined();
   });
 

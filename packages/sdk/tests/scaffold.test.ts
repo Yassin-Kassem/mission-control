@@ -43,7 +43,7 @@ describe('scaffoldDrone', () => {
   it('generates package.json with correct name', () => {
     scaffoldDrone('security-check', tmpDir);
     const pkg = JSON.parse(fs.readFileSync(path.join(tmpDir, 'security-check', 'package.json'), 'utf-8'));
-    expect(pkg.name).toBe('@mctl/drone-security-check');
+    expect(pkg.name).toBe('@missionctl/drone-security-check');
     expect(pkg.keywords).toContain('mission-control');
     expect(pkg.keywords).toContain('drone');
   });

@@ -1,5 +1,5 @@
 import chalk from 'chalk';
-import type { SignalBus, Signal } from '@mctl/core';
+import type { SignalBus, Signal } from '@missionctl/core';
 import { type DroneDisplayState, renderDronePanelColored } from './drone-panel.js';
 import { formatDuration } from '../format.js';
 

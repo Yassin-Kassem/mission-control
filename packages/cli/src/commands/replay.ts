@@ -1,4 +1,4 @@
-import { type Mission, type Signal } from '@mctl/core';
+import { type Mission, type Signal } from '@missionctl/core';
 import { loadProjectContext } from '../context.js';
 import { formatTimestamp } from '../format.js';
 import { banner, sectionStart, sectionEnd, kv, separator, statusBadge, colors, error as themeError } from '../ui/theme.js';

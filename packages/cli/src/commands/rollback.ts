@@ -1,4 +1,4 @@
-import { MissionRollback } from '@mctl/core';
+import { MissionRollback } from '@missionctl/core';
 
 export function createSnapshot(missionId: string, projectDir: string): string {
   const rb = new MissionRollback(projectDir);

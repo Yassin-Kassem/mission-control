@@ -1,5 +1,5 @@
 {
-  "name": "@mctl/core",
+  "name": "@missionctl/core",
   "version": "0.1.0",
   "description": "Mission Control core engine — signals, memory, drones, and mission lifecycle",
   "type": "module",

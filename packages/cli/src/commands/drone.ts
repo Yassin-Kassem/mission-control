@@ -1,5 +1,5 @@
-import { type DroneManifest, parseDroneManifest, validateManifest } from '@mctl/core';
-import { scaffoldDrone as doScaffold } from '@mctl/sdk';
+import { type DroneManifest, parseDroneManifest, validateManifest } from '@missionctl/core';
+import { scaffoldDrone as doScaffold } from '@missionctl/sdk';
 import fs from 'fs';
 import path from 'path';
 import { banner, sectionStart, sectionEnd, kv, separator, colors, table, success, info, error as themeError } from '../ui/theme.js';

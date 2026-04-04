@@ -1,5 +1,5 @@
 {
-  "name": "@mctl/cli",
+  "name": "@missionctl/cli",
   "version": "0.1.0",
   "description": "Mission Control CLI — tactical command interface for AI orchestration",
   "type": "module",
@@ -17,8 +17,8 @@
     "lint": "eslint src/"
   },
   "dependencies": {
-    "@mctl/core": "workspace:*",
-    "@mctl/sdk": "workspace:*",
+    "@missionctl/core": "workspace:*",
+    "@missionctl/sdk": "workspace:*",
     "chalk": "^5.0.0",
     "commander": "^13.0.0",
     "ws": "^8.0.0"

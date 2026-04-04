@@ -1,4 +1,4 @@
-import type { SignalBus, Signal } from '@mctl/core';
+import type { SignalBus, Signal } from '@missionctl/core';
 
 type BroadcastListener = (signal: Signal) => void;
 

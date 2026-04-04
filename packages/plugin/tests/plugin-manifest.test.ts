@@ -57,13 +57,13 @@ describe('skills', () => {
     expect(content).toContain('description:');
   });
 
-  it('skills reference npx @mctl/cli (not bash binary)', () => {
+  it('skills reference npx @missionctl/cli (not bash binary)', () => {
     const runSkill = fs.readFileSync(path.join(skillsDir, 'mission-run', 'SKILL.md'), 'utf-8');
     const createSkill = fs.readFileSync(path.join(skillsDir, 'drone-create', 'SKILL.md'), 'utf-8');
 
     // Should use npx, not the old bash binary
-    expect(runSkill).toContain('npx @mctl/cli');
-    expect(createSkill).toContain('npx @mctl/cli');
+    expect(runSkill).toContain('npx @missionctl/cli');
+    expect(createSkill).toContain('npx @missionctl/cli');
     expect(runSkill).not.toContain('${CLAUDE_PLUGIN_ROOT}/bin/mission');
     expect(createSkill).not.toContain('${CLAUDE_PLUGIN_ROOT}/bin/mission');
   });

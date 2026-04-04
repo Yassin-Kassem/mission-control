@@ -1,6 +1,6 @@
 import { describe, it, expect, afterEach } from 'vitest';
 import { DashboardServer } from '../../src/dashboard/server.js';
-import { SignalBus } from '@mctl/core';
+import { SignalBus } from '@missionctl/core';
 
 describe('DashboardServer', () => {
   let server: DashboardServer;

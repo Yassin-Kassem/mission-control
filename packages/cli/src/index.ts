@@ -1,6 +1,6 @@
 #!/usr/bin/env node
 import { Command } from 'commander';
-import { type MemoryLayerName } from '@mctl/core';
+import { type MemoryLayerName } from '@missionctl/core';
 import { initProject, printInit } from './commands/init.js';
 import { runMission } from './commands/run.js';
 import { printStatus } from './commands/status.js';

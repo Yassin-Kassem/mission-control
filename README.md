@@ -46,7 +46,7 @@ It adapts to the task. A typo fix runs solo with zero ceremony. A large feature 
 ### Install
 
 ```bash
-npm install -g @mctl/cli
+npm install -g @missionctl/cli
 ```
 
 ### Initialize a Project
@@ -134,15 +134,15 @@ mission budget                  Token usage summary
 ```
 mission-control/
 ├── packages/
-│   ├── core/       @mctl/core    Engine: signals, memory, drones, missions, recovery
-│   ├── cli/        @mctl/cli     Terminal interface with tactical HUD
-│   ├── sdk/        @mctl/sdk     Drone development kit
+│   ├── core/       @missionctl/core    Engine: signals, memory, drones, missions, recovery
+│   ├── cli/        @missionctl/cli     Terminal interface with tactical HUD
+│   ├── sdk/        @missionctl/sdk     Drone development kit
 │   └── plugin/     Claude Code plugin with skills and hooks
 ├── turbo.json                    Turborepo build config
 └── pnpm-workspace.yaml          Monorepo workspace
 ```
 
-### Core Engine (`@mctl/core`)
+### Core Engine (`@missionctl/core`)
 
 - **SignalBus** — EventEmitter-based pub/sub with topic pattern matching (wildcard `*`, prefix `drone.*`)
 - **MemoryManager** — Three-layer SQLite memory (short → working → long) with auto-promotion rules
@@ -167,7 +167,7 @@ mission-control/
 | **Debugger** | AI | Diagnoses and fixes failures |
 | **Docs** | AI | Writes documentation |
 
-### Drone SDK (`@mctl/sdk`)
+### Drone SDK (`@missionctl/sdk`)
 
 Build custom drones with YAML manifests:
 
@@ -195,7 +195,7 @@ signals:
 mission drone create my-linter
 
 # Test with the SDK harness
-import { DroneTestHarness } from '@mctl/sdk';
+import { DroneTestHarness } from '@missionctl/sdk';
 const harness = DroneTestHarness.fromDirectory('./my-linter');
 const errors = harness.validate();
 const shouldFire = harness.shouldActivate(['lint', 'fix'], 'medium');
@@ -268,10 +268,10 @@ node packages/cli/dist/index.js run "test task"
 
 | Package | Description |
 |---------|-------------|
-| `@mctl/core` | Core engine — signals, memory, drones, missions, recovery |
-| `@mctl/cli` | CLI interface — tactical terminal HUD |
-| `@mctl/sdk` | Drone SDK — build, test, and share custom drones |
-| `@mctl/claude-code-plugin` | Claude Code plugin with skills and hooks |
+| `@missionctl/core` | Core engine — signals, memory, drones, missions, recovery |
+| `@missionctl/cli` | CLI interface — tactical terminal HUD |
+| `@missionctl/sdk` | Drone SDK — build, test, and share custom drones |
+| `@missionctl/claude-code-plugin` | Claude Code plugin with skills and hooks |
 
 ---
 

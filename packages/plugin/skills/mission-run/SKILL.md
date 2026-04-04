@@ -10,17 +10,17 @@ Orchestrate a mission using the Mission Control drone swarm. Each drone is a rea
 ## Setup
 
 ```bash
-npx @mctl/cli --version 2>/dev/null || echo "INSTALL_NEEDED"
+npx @missionctl/cli --version 2>/dev/null || echo "INSTALL_NEEDED"
 ```
 
-If INSTALL_NEEDED: tell the user to run `npm install -g @mctl/cli`.
+If INSTALL_NEEDED: tell the user to run `npm install -g @missionctl/cli`.
 
 ## Step 1: Initialize + Dispatch Plan
 
 ```bash
-test -d .mctl || npx @mctl/cli init
+test -d .mctl || npx @missionctl/cli init
 mkdir -p .mctl/mission
-npx @mctl/cli dispatch "$ARGUMENTS" > .mctl/mission/dispatch.json
+npx @missionctl/cli dispatch "$ARGUMENTS" > .mctl/mission/dispatch.json
 ```
 
 Read `.mctl/mission/dispatch.json`. It contains a structured plan:
@@ -33,7 +33,7 @@ Read `.mctl/mission/dispatch.json`. It contains a structured plan:
   "scope": "medium",
   "mode": "copilot",
   "steps": [
-    { "drone": "scout", "type": "tool", "command": "npx @mctl/cli drone exec scout", "outputs": ["scout.json"] },
+    { "drone": "scout", "type": "tool", "command": "npx @missionctl/cli drone exec scout", "outputs": ["scout.json"] },
     { "drone": "architect", "type": "ai", "model": "sonnet", "prompt": "...", "inputs": ["scout.json"], "outputs": ["plan.md"] },
     { "drone": "coder", "type": "ai", "model": "sonnet", "prompt": "...", "inputs": ["scout.json", "plan.md"], "outputs": ["coder.md"] },
     ...
@@ -73,7 +73,7 @@ Run the command and redirect output to `.mctl/mission/`:
 
 ```bash
 # Example for scout
-npx @mctl/cli drone exec scout > .mctl/mission/scout.json
+npx @missionctl/cli drone exec scout > .mctl/mission/scout.json
 ```
 
 ### For AI drones (`type: "ai"`):
@@ -118,13 +118,13 @@ cat .mctl/mission/tester.json
 
 ```bash
 # Get a targeted fix prompt
-npx @mctl/cli drone-prompt debugger "fix failing tests" > /tmp/fix-prompt.json
+npx @missionctl/cli drone-prompt debugger "fix failing tests" > /tmp/fix-prompt.json
 ```
 
 Dispatch a debugger subagent with that prompt. After the fix, re-run tester:
 
 ```bash
-npx @mctl/cli drone exec tester > .mctl/mission/tester.json
+npx @missionctl/cli drone exec tester > .mctl/mission/tester.json
 ```
 
 ## Step 5: Review Loop
@@ -150,7 +150,7 @@ Then re-run reviewer.
 | reviewer  | ai   | [clean or findings]         |
 
 Snapshot: mission-pre-[id]
-Rollback: npx @mctl/cli rollback [id]
+Rollback: npx @missionctl/cli rollback [id]
 ```
 
 ## How Drones Work
@@ -159,9 +159,9 @@ Each drone is defined by:
 - **drone.yaml** — manifest with name, type, triggers, signals, inputs/outputs
 - **skill.md** — behavior instructions (AI drones only)
 
-The `dispatch` command reads these files, builds context-aware prompts, and outputs a structured execution plan. Community drones installed via `npx @mctl/cli drone add <path>` get the same treatment — their skill files become subagent prompts.
+The `dispatch` command reads these files, builds context-aware prompts, and outputs a structured execution plan. Community drones installed via `npx @missionctl/cli drone add <path>` get the same treatment — their skill files become subagent prompts.
 
-To create a new drone: use the `drone-create` skill or run `npx @mctl/cli drone create <name>`.
+To create a new drone: use the `drone-create` skill or run `npx @missionctl/cli drone create <name>`.
 
 ## Token Efficiency
 

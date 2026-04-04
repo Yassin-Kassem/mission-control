@@ -63,7 +63,7 @@ When activated as an AI drone, follow these steps:
 
   // package.json
   const pkg = {
-    name: `@mctl/drone-${name}`,
+    name: `@missionctl/drone-${name}`,
     version: '0.0.1',
     description: `${name} drone for Mission Control`,
     keywords: ['mission-control', 'drone', name],
@@ -76,7 +76,7 @@ When activated as an AI drone, follow these steps:
   // tests/drone.test.ts
   const droneDirForwardSlash = path.join(droneDir).replace(/\\/g, '/');
   const test = `import { describe, it, expect } from 'vitest';
-import { DroneTestHarness } from '@mctl/sdk';
+import { DroneTestHarness } from '@missionctl/sdk';
 
 describe('${name} drone', () => {
   it('has a valid manifest', () => {

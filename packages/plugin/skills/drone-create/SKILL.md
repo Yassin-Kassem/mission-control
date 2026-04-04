@@ -8,7 +8,7 @@ description: Use when the user wants to create, build, or add a custom drone for
 ## Setup
 
 ```bash
-npx @mctl/cli --version 2>/dev/null || echo "Run: npm install -g @mctl/cli"
+npx @missionctl/cli --version 2>/dev/null || echo "Run: npm install -g @missionctl/cli"
 ```
 
 ## Decide: Tool or AI?
@@ -37,7 +37,7 @@ digraph drone_type {
 ## Step 1: Scaffold
 
 ```bash
-npx @mctl/cli drone create <name>
+npx @missionctl/cli drone create <name>
 ```
 
 Creates: `drone.yaml`, `skills/main.md`, `tests/drone.test.ts`, `package.json`, `README.md`
@@ -130,11 +130,11 @@ Then export from `packages/core/src/index.ts` and add to `packages/cli/src/comma
 
 ```bash
 # Install the drone locally
-npx @mctl/cli drone add ./<name>
+npx @missionctl/cli drone add ./<name>
 
 # Verify it shows in fleet
-npx @mctl/cli drone list
-npx @mctl/cli drone info <name>
+npx @missionctl/cli drone list
+npx @missionctl/cli drone info <name>
 ```
 
 ## Step 6: Share
@@ -143,7 +143,7 @@ npx @mctl/cli drone info <name>
 # Push to GitHub
 cd <name> && git init && git add . && git commit -m "Initial drone"
 # Others install with:
-# git clone <url> && npx @mctl/cli drone add ./<name>
+# git clone <url> && npx @missionctl/cli drone add ./<name>
 ```
 
 ## Common Mistakes

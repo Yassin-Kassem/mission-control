@@ -1,4 +1,4 @@
-import { createMissionId } from '@mctl/core';
+import { createMissionId } from '@missionctl/core';
 import { loadProjectContext } from '../context.js';
 
 export interface DispatchOptions {
@@ -64,7 +64,7 @@ export function generateDronePrompt(projectDir: string, droneName: string, task:
     return JSON.stringify({
       drone: droneName,
       type: 'tool',
-      command: `npx @mctl/cli drone exec ${droneName}`,
+      command: `npx @missionctl/cli drone exec ${droneName}`,
     });
   }
 
