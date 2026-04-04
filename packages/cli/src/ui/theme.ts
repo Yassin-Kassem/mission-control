@@ -18,19 +18,30 @@ export const colors = {
   success: chalk.hex('#00FF9F'),      // Same as primary
 };
 
-// The ASCII drone — displayed on init
+// The ASCII art — displayed on init
 export const DRONE_ASCII = `
-${colors.primary('    ╔══════════════════════════════════════╗')}
-${colors.primary('    ║')}  ${colors.secondary('◉')}                              ${colors.secondary('◉')}  ${colors.primary('║')}
-${colors.primary('    ║')}     ${colors.dim('╔══════════════════════╗')}     ${colors.primary('║')}
-${colors.primary('    ║')}     ${colors.dim('║')}  ${colors.bright('M I S S I O N')}       ${colors.dim('║')}     ${colors.primary('║')}
-${colors.primary('    ║')}     ${colors.dim('║')}  ${colors.bright('C O N T R O L')}       ${colors.dim('║')}     ${colors.primary('║')}
-${colors.primary('    ║')}     ${colors.dim('╚══════════════════════╝')}     ${colors.primary('║')}
-${colors.primary('    ║')}  ${colors.secondary('◉')}                              ${colors.secondary('◉')}  ${colors.primary('║')}
-${colors.primary('    ╠══╗')}                            ${colors.primary('╔══╣')}
-${colors.primary('    ║')}${colors.warning('▓▓')}${colors.primary('║')}      ${colors.muted('▪ ▪ ▪ ▪ ▪ ▪')}      ${colors.primary('║')}${colors.warning('▓▓')}${colors.primary('║')}
-${colors.primary('    ╠══╝')}                            ${colors.primary('╚══╣')}
-${colors.primary('    ╚══════════════════════════════════════╝')}
+${colors.primary('    ███╗   ███╗ ██╗ ███████╗ ███████╗ ██╗  ██████╗  ███╗   ██╗')}
+${colors.primary('    ████╗ ████║ ██║ ██╔════╝ ██╔════╝ ██║ ██╔═══██╗ ████╗  ██║')}
+${colors.primary('    ██╔████╔██║ ██║ ███████╗ ███████╗ ██║ ██║   ██║ ██╔██╗ ██║')}
+${colors.primary('    ██║╚██╔╝██║ ██║ ╚════██║ ╚════██║ ██║ ██║   ██║ ██║╚██╗██║')}
+${colors.primary('    ██║ ╚═╝ ██║ ██║ ███████║ ███████║ ██║ ╚██████╔╝ ██║ ╚████║')}
+${colors.primary('    ╚═╝     ╚═╝ ╚═╝ ╚══════╝ ╚══════╝ ╚═╝  ╚═════╝  ╚═╝  ╚═══╝')}
+
+${colors.secondary('     ██████╗  ██████╗  ███╗   ██╗ ████████╗ ██████╗   ██████╗  ██╗')}
+${colors.secondary('    ██╔════╝ ██╔═══██╗ ████╗  ██║ ╚══██╔══╝ ██╔══██╗ ██╔═══██╗ ██║')}
+${colors.secondary('    ██║      ██║   ██║ ██╔██╗ ██║    ██║    ██████╔╝ ██║   ██║ ██║')}
+${colors.secondary('    ██║      ██║   ██║ ██║╚██╗██║    ██║    ██╔══██╗ ██║   ██║ ██║')}
+${colors.secondary('    ╚██████╗ ╚██████╔╝ ██║ ╚████║    ██║    ██║  ██║ ╚██████╔╝ ███████╗')}
+${colors.secondary('     ╚═════╝  ╚═════╝  ╚═╝  ╚═══╝   ╚═╝    ╚═╝  ╚═╝  ╚═════╝  ╚══════╝')}
+
+${colors.dim('                        ─── ◈ ───')}
+
+${colors.muted('                  ╭──────────────────╮')}
+${colors.muted('             ═════╡')} ${colors.warning('▲')} ${colors.bright('DRONE READY')} ${colors.warning('▲')} ${colors.muted('╞═════')}
+${colors.muted('            ╱')}     ${colors.muted('╰──────────────────╯')}     ${colors.muted('╲')}
+${colors.muted('       ◉───◉')}                                  ${colors.muted('◉───◉')}
+${colors.muted('        ╲')} ${colors.warning('▓▓')} ${colors.muted('╱')}                              ${colors.muted('╲')} ${colors.warning('▓▓')} ${colors.muted('╱')}
+${colors.muted('         ╰╯')}                                  ${colors.muted('╰╯')}
 `;
 
 // Compact logo for headers
