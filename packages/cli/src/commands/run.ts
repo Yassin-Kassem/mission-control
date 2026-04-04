@@ -58,7 +58,12 @@ export async function runMission(description: string, projectDir: string, option
     bus: ctx.bus, memory: ctx.memory, missionStore: ctx.missionStore,
     checkpoints: ctx.checkpoints, planner: ctx.planner,
     resolveExecutor: (_name: string): DroneExecutor => ({
-      async execute() { return { summary: `${_name} completed (placeholder)` }; },
+      async execute() {
+        // Simulate work — real drones will replace this
+        const delay = 300 + Math.random() * 500;
+        await new Promise((resolve) => setTimeout(resolve, delay));
+        return { summary: `${_name} completed (placeholder)` };
+      },
     }),
   });
 
