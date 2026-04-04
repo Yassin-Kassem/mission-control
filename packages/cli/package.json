@@ -8,6 +8,7 @@
   },
   "files": ["dist"],
   "license": "MIT",
+  "publishConfig": { "access": "public" },
   "keywords": ["cli", "claude", "ai", "orchestration", "mission-control"],
   "scripts": {
     "build": "tsc",

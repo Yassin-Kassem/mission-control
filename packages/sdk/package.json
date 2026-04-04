@@ -7,6 +7,7 @@
   "types": "dist/index.d.ts",
   "files": ["dist"],
   "license": "MIT",
+  "publishConfig": { "access": "public" },
   "keywords": ["sdk", "claude", "ai", "drones", "mission-control"],
   "scripts": {
     "build": "tsc",

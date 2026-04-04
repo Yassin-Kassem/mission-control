@@ -266,11 +266,12 @@ node packages/cli/dist/index.js run "test task"
 
 ## Packages
 
-| Package | npm | Description |
-|---------|-----|-------------|
-| `@mctl/core` | [![npm](https://img.shields.io/npm/v/@mctl/core)](https://www.npmjs.com/package/@mctl/core) | Core engine |
-| `@mctl/cli` | [![npm](https://img.shields.io/npm/v/@mctl/cli)](https://www.npmjs.com/package/@mctl/cli) | CLI interface |
-| `@mctl/sdk` | [![npm](https://img.shields.io/npm/v/@mctl/sdk)](https://www.npmjs.com/package/@mctl/sdk) | Drone SDK |
+| Package | Description |
+|---------|-------------|
+| `@mctl/core` | Core engine — signals, memory, drones, missions, recovery |
+| `@mctl/cli` | CLI interface — tactical terminal HUD |
+| `@mctl/sdk` | Drone SDK — build, test, and share custom drones |
+| `@mctl/claude-code-plugin` | Claude Code plugin with skills and hooks |
 
 ---
 
