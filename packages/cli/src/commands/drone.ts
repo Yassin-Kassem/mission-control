@@ -1,6 +1,8 @@
-import { type DroneManifest } from '@mctl/core';
+import { type DroneManifest, parseDroneManifest, validateManifest } from '@mctl/core';
 import { scaffoldDrone as doScaffold } from '@mctl/sdk';
 import chalk from 'chalk';
+import fs from 'fs';
+import path from 'path';
 import { loadProjectContext } from '../context.js';
 
 export function listDrones(projectDir: string): DroneManifest[] {
@@ -95,6 +97,70 @@ export function scaffoldNewDrone(name: string, targetDir: string): void {
   console.log(`  1. Edit ${name}/drone.yaml to configure triggers and signals`);
   console.log(`  2. Edit ${name}/skills/main.md to define drone behavior`);
   console.log(`  3. Run tests: cd ${name} && npx vitest run`);
+}
+
+export function addDrone(source: string, projectDir: string): string {
+  const dronesDir = path.join(projectDir, '.mctl', 'drones');
+  fs.mkdirSync(dronesDir, { recursive: true });
+
+  // Resolve source path
+  const sourcePath = path.resolve(source);
+  if (!fs.existsSync(sourcePath)) {
+    throw new Error(`Source not found: ${source}`);
+  }
+
+  // Verify it has a drone.yaml
+  const manifestPath = path.join(sourcePath, 'drone.yaml');
+  if (!fs.existsSync(manifestPath)) {
+    throw new Error(`No drone.yaml found in ${source}. Not a valid drone.`);
+  }
+
+  // Parse and validate
+  const content = fs.readFileSync(manifestPath, 'utf-8');
+  const manifest = parseDroneManifest(content);
+  const errors = validateManifest(manifest);
+  if (errors.length > 0) {
+    throw new Error(`Invalid drone manifest: ${errors.join(', ')}`);
+  }
+
+  // Copy to .mctl/drones/
+  const targetDir = path.join(dronesDir, manifest.name);
+  if (fs.existsSync(targetDir)) {
+    throw new Error(`Drone "${manifest.name}" is already installed. Remove it first.`);
+  }
+
+  copyDirSync(sourcePath, targetDir);
+  return manifest.name;
+}
+
+export function removeDrone(name: string, projectDir: string): void {
+  const droneDir = path.join(projectDir, '.mctl', 'drones', name);
+  if (!fs.existsSync(droneDir)) {
+    throw new Error(`Drone "${name}" is not installed.`);
+  }
+  fs.rmSync(droneDir, { recursive: true, force: true });
+}
+
+export function listInstalledDrones(projectDir: string): string[] {
+  const dronesDir = path.join(projectDir, '.mctl', 'drones');
+  if (!fs.existsSync(dronesDir)) return [];
+  return fs.readdirSync(dronesDir, { withFileTypes: true })
+    .filter((e) => e.isDirectory() && fs.existsSync(path.join(dronesDir, e.name, 'drone.yaml')))
+    .map((e) => e.name);
+}
+
+function copyDirSync(src: string, dest: string): void {
+  fs.mkdirSync(dest, { recursive: true });
+  const entries = fs.readdirSync(src, { withFileTypes: true });
+  for (const entry of entries) {
+    const srcPath = path.join(src, entry.name);
+    const destPath = path.join(dest, entry.name);
+    if (entry.isDirectory()) {
+      copyDirSync(srcPath, destPath);
+    } else {
+      fs.copyFileSync(srcPath, destPath);
+    }
+  }
 }
 
 function fit(str: string, width: number): string {

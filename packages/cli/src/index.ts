@@ -6,7 +6,7 @@ import { runMission } from './commands/run.js';
 import { printStatus } from './commands/status.js';
 import { printHistory } from './commands/history.js';
 import { printReplay } from './commands/replay.js';
-import { printDroneList, printDroneInfo, scaffoldNewDrone } from './commands/drone.js';
+import { printDroneList, printDroneInfo, scaffoldNewDrone, addDrone, removeDrone, listInstalledDrones } from './commands/drone.js';
 import { printDroneExec } from './commands/drone-exec.js';
 import { printMemory, promoteMemory, forgetMemory } from './commands/memory.js';
 import { printConfig } from './commands/config.js';
@@ -124,6 +124,51 @@ droneCmd
     } catch (err) {
       console.error((err as Error).message);
       process.exit(1);
+    }
+  });
+
+droneCmd
+  .command('add')
+  .description('Install a community drone from a local path')
+  .argument('<source>', 'Path to drone directory')
+  .action((source: string) => {
+    try {
+      const name = addDrone(source, process.cwd());
+      console.log(`Drone "${name}" installed. It will activate on matching keywords in future missions.`);
+    } catch (err) {
+      console.error((err as Error).message);
+      process.exit(1);
+    }
+  });
+
+droneCmd
+  .command('remove')
+  .description('Uninstall a community drone')
+  .argument('<name>', 'Drone name')
+  .action((name: string) => {
+    try {
+      removeDrone(name, process.cwd());
+      console.log(`Drone "${name}" removed.`);
+    } catch (err) {
+      console.error((err as Error).message);
+      process.exit(1);
+    }
+  });
+
+droneCmd
+  .command('installed')
+  .description('List installed community drones')
+  .action(() => {
+    const installed = listInstalledDrones(process.cwd());
+    if (installed.length === 0) {
+      console.log('No community drones installed.');
+      console.log('Create one: mission drone create <name>');
+      console.log('Install one: mission drone add <path>');
+    } else {
+      console.log(`Installed community drones (${installed.length}):\n`);
+      for (const name of installed) {
+        console.log(`  ${name}`);
+      }
     }
   });
 
