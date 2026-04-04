@@ -12,7 +12,14 @@ describe('TesterExecutor', () => {
   it('detects test command from package.json', () => {
     fs.writeFileSync(path.join(tmpDir, 'package.json'), JSON.stringify({ scripts: { test: 'vitest run' } }));
     const tester = new TesterExecutor(tmpDir);
-    expect(tester.getTestCommand()).toBe('vitest run');
+    expect(tester.getTestCommand()).toBe('npm test');
+  });
+
+  it('uses pnpm when pnpm-lock.yaml exists', () => {
+    fs.writeFileSync(path.join(tmpDir, 'package.json'), JSON.stringify({ scripts: { test: 'vitest run' } }));
+    fs.writeFileSync(path.join(tmpDir, 'pnpm-lock.yaml'), '');
+    const tester = new TesterExecutor(tmpDir);
+    expect(tester.getTestCommand()).toBe('pnpm test');
   });
 
   it('returns not-found when no test command exists', () => {

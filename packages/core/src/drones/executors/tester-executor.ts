@@ -13,7 +13,9 @@ export class TesterExecutor {
         const pkg = JSON.parse(fs.readFileSync(pkgPath, 'utf-8'));
         const testScript = pkg.scripts?.test;
         if (testScript && testScript !== 'echo "Error: no test specified" && exit 1') {
-          return testScript;
+          // Use the package manager to run the script (ensures PATH includes node_modules/.bin)
+          const pm = this.detectPackageManager();
+          return `${pm} test`;
         }
       } catch { /* ignore */ }
     }
@@ -26,6 +28,13 @@ export class TesterExecutor {
       if (/pytest/i.test(content)) return 'pytest';
     }
     return null;
+  }
+
+  private detectPackageManager(): string {
+    if (fs.existsSync(path.join(this.projectDir, 'pnpm-lock.yaml'))) return 'pnpm';
+    if (fs.existsSync(path.join(this.projectDir, 'yarn.lock'))) return 'yarn';
+    if (fs.existsSync(path.join(this.projectDir, 'bun.lockb'))) return 'bun';
+    return 'npm';
   }
 
   async execute(): Promise<DroneResult & { command: string | null; exitCode: number; output: string }> {
