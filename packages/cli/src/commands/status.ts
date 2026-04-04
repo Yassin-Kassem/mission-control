@@ -2,7 +2,6 @@ import { type Mission } from '@swarm/core';
 import chalk from 'chalk';
 import { loadProjectContext } from '../context.js';
 import { formatStatus, formatTimestamp } from '../format.js';
-import { renderBox, renderDivider, padRight } from '../ui/layout.js';
 
 export interface SwarmStatus {
   totalMissions: number;
@@ -31,28 +30,37 @@ export function getStatus(projectDir: string): SwarmStatus {
 
 export function printStatus(projectDir: string): void {
   const status = getStatus(projectDir);
-  const w = 60;
+  const w = 52;
   const inner = w - 2;
 
+  const ln = (s: string) => `│${pad(s, inner)}│`;
+
   const lines: string[] = [];
+  lines.push(`┌ SWARM STATUS ${'─'.repeat(inner - 15)}┐`);
 
   if (status.latestMission) {
-    lines.push(` Missions:  ${chalk.bold(String(status.totalMissions))} total`);
-    lines.push(` Latest:    ${formatStatus(status.latestMission.status)}`);
-    lines.push(`            "${status.latestMission.description}"`);
-    lines.push(`            ${chalk.gray(formatTimestamp(status.latestMission.createdAt))}`);
+    lines.push(ln(` Missions:   ${chalk.bold(String(status.totalMissions))} total`));
+    lines.push(ln(` Latest:     ${formatStatus(status.latestMission.status)}`));
+    lines.push(ln(`             "${status.latestMission.description}"`));
+    lines.push(ln(`             ${chalk.gray(formatTimestamp(status.latestMission.createdAt))}`));
   } else {
-    lines.push(` Missions:  ${chalk.gray('none yet')}`);
+    lines.push(ln(` Missions:   ${chalk.gray('none yet')}`));
   }
 
-  lines.push('');
-  lines.push(chalk.bold(' Memory'));
-  lines.push(`  short-term  ${chalk.bold(String(status.memoryStats.short))} entries`);
-  lines.push(`  working     ${chalk.bold(String(status.memoryStats.working))} entries`);
-  lines.push(`  long-term   ${chalk.bold(String(status.memoryStats.long))} entries`);
+  lines.push(ln(''));
+  lines.push(ln(chalk.bold(' Memory')));
+  lines.push(ln(`   short-term  ${String(status.memoryStats.short)} entries`));
+  lines.push(ln(`   working     ${String(status.memoryStats.working)} entries`));
+  lines.push(ln(`   long-term   ${String(status.memoryStats.long)} entries`));
+  lines.push(ln(''));
+  lines.push(ln(` Drones:     ${chalk.bold(String(status.registeredDrones))} registered`));
 
-  lines.push('');
-  lines.push(` Drones:    ${chalk.bold(String(status.registeredDrones))} registered`);
+  lines.push(`└${'─'.repeat(inner)}┘`);
+  console.log(lines.join('\n'));
+}
 
-  console.log(renderBox('SWARM STATUS', lines, w));
+function pad(str: string, width: number): string {
+  const plain = str.replace(/\x1b\[\d*(;\d+)*m/g, '');
+  const padding = Math.max(0, width - plain.length);
+  return str + ' '.repeat(padding);
 }

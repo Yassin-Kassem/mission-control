@@ -1,7 +1,7 @@
 import { type DroneManifest } from '@swarm/core';
 import chalk from 'chalk';
 import { loadProjectContext } from '../context.js';
-import { renderBox, renderDivider, padRight } from '../ui/layout.js';
+import { padRight } from '../ui/layout.js';
 
 export function listDrones(projectDir: string): DroneManifest[] {
   const ctx = loadProjectContext(projectDir);
@@ -19,54 +19,87 @@ export function getDroneInfo(projectDir: string, name: string): DroneManifest | 
 
 export function printDroneList(projectDir: string): void {
   const drones = listDrones(projectDir);
-  const w = 60;
-  const lines: string[] = [];
+  const w = 64;
+  const inner = w - 2;
 
-  lines.push(` ${chalk.gray(padRight('Name', 12))}  ${chalk.gray(padRight('Priority', 8))}  ${chalk.gray('Description')}`);
+  const ln = (s: string) => `│${pad(s, inner)}│`;
+
+  const lines: string[] = [];
+  lines.push(`┌ DRONES (${drones.length}) ${'─'.repeat(Math.max(0, inner - 12 - String(drones.length).length))}┐`);
+  lines.push(ln(` ${chalk.gray(padRight('Name', 12))}  ${chalk.gray(padRight('Pri', 4))}  ${chalk.gray('Description')}`));
 
   for (const d of drones) {
-    const prio = d.priority >= 80 ? chalk.green(String(d.priority))
-      : d.priority >= 40 ? chalk.yellow(String(d.priority))
-      : chalk.gray(String(d.priority));
-
-    lines.push(` ${padRight(d.name, 12)}  ${padRight(String(d.priority), 8)}  ${chalk.gray(d.description)}`);
+    lines.push(ln(` ${padRight(d.name, 12)}  ${padRight(String(d.priority), 4)}  ${chalk.gray(d.description)}`));
   }
 
-  console.log(renderBox(`DRONES (${drones.length})`, lines, w));
+  lines.push(`└${'─'.repeat(inner)}┘`);
+  console.log(lines.join('\n'));
 }
 
 export function printDroneInfo(projectDir: string, name: string): void {
   const drone = getDroneInfo(projectDir, name);
-  const w = 50;
 
   if (!drone) {
-    console.log(renderBox('DRONE', [chalk.red(` Drone "${name}" not found.`)], w));
+    const lines = [
+      `┌ DRONE ────────────────────────────────┐`,
+      `│${pad(chalk.red(` Drone "${name}" not found.`), 38)}│`,
+      `└──────────────────────────────────────┘`,
+    ];
+    console.log(lines.join('\n'));
     return;
   }
 
-  const lines: string[] = [
-    ` ${chalk.bold(drone.name)}`,
-    ` ${chalk.gray(drone.description)}`,
-    '',
-    ` Priority:    ${chalk.bold(String(drone.priority))}`,
-    ` Escalation:  ${drone.escalation}`,
-  ];
+  // Calculate width based on content
+  let maxPlain = 30;
+  const infoLines: string[] = [];
+  infoLines.push(` ${drone.name}`);
+  infoLines.push(` ${drone.description}`);
+  infoLines.push(` Priority:    ${String(drone.priority)}`);
+  infoLines.push(` Escalation:  ${drone.escalation}`);
+  if (drone.triggers.keywords) {
+    infoLines.push(` Keywords:    ${(drone.triggers.keywords as string[]).join(', ')}`);
+  }
+  if (drone.opinions.requires.length) infoLines.push(` Requires:    ${drone.opinions.requires.join(', ')}`);
+  if (drone.opinions.blocks.length) infoLines.push(` Blocks:      ${drone.opinions.blocks.join(', ')}`);
+  if (drone.signals.emits.length) infoLines.push(` Emits:       ${drone.signals.emits.join(', ')}`);
+  if (drone.signals.listens.length) infoLines.push(` Listens:     ${drone.signals.listens.join(', ')}`);
+  for (const l of infoLines) maxPlain = Math.max(maxPlain, l.length);
+
+  const w = Math.min(maxPlain + 4, 80);
+  const inner = w - 2;
+
+  const ln = (s: string) => `│${pad(s, inner)}│`;
+
+  const lines: string[] = [];
+  lines.push(`┌ DRONE ${'─'.repeat(inner - 7)}┐`);
+  lines.push(ln(` ${chalk.bold(drone.name)}`));
+  lines.push(ln(` ${chalk.gray(drone.description)}`));
+  lines.push(ln(''));
+  lines.push(ln(` Priority:    ${String(drone.priority)}`));
+  lines.push(ln(` Escalation:  ${drone.escalation}`));
 
   if (drone.triggers.keywords) {
-    lines.push(` Keywords:    ${chalk.cyan((drone.triggers.keywords as string[]).join(', '))}`);
+    lines.push(ln(` Keywords:    ${chalk.cyan((drone.triggers.keywords as string[]).join(', '))}`));
   }
   if (drone.opinions.requires.length) {
-    lines.push(` Requires:    ${drone.opinions.requires.join(', ')}`);
+    lines.push(ln(` Requires:    ${drone.opinions.requires.join(', ')}`));
   }
   if (drone.opinions.blocks.length) {
-    lines.push(` Blocks:      ${chalk.red(drone.opinions.blocks.join(', '))}`);
+    lines.push(ln(` Blocks:      ${chalk.red(drone.opinions.blocks.join(', '))}`));
   }
   if (drone.signals.emits.length) {
-    lines.push(` Emits:       ${chalk.green(drone.signals.emits.join(', '))}`);
+    lines.push(ln(` Emits:       ${chalk.green(drone.signals.emits.join(', '))}`));
   }
   if (drone.signals.listens.length) {
-    lines.push(` Listens:     ${chalk.yellow(drone.signals.listens.join(', '))}`);
+    lines.push(ln(` Listens:     ${chalk.yellow(drone.signals.listens.join(', '))}`));
   }
 
-  console.log(renderBox('DRONE', lines, w));
+  lines.push(`└${'─'.repeat(inner)}┘`);
+  console.log(lines.join('\n'));
+}
+
+function pad(str: string, width: number): string {
+  const plain = str.replace(/\x1b\[\d*(;\d+)*m/g, '');
+  const padding = Math.max(0, width - plain.length);
+  return str + ' '.repeat(padding);
 }

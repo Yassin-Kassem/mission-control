@@ -1,7 +1,6 @@
 import fs from 'fs';
 import path from 'path';
 import chalk from 'chalk';
-import { renderBox } from '../ui/layout.js';
 
 export function getConfig(projectDir: string): string {
   const configPath = path.join(projectDir, '.swarm', 'config.yaml');
@@ -13,10 +12,33 @@ export function getConfig(projectDir: string): string {
 
 export function printConfig(projectDir: string): void {
   const config = getConfig(projectDir);
-  const configLines = config.split('\n').map((line) => {
-    if (line.startsWith('#')) return chalk.gray(` ${line}`);
-    return ` ${line}`;
-  });
+  // Size box to fit content
+  let maxLine = 30;
+  for (const raw of config.split('\n')) {
+    maxLine = Math.max(maxLine, raw.length + 2); // +2 for leading space
+  }
+  const w = Math.min(maxLine + 4, 80); // +4 for borders + margin
+  const inner = w - 2;
 
-  console.log(renderBox('CONFIG (.swarm/config.yaml)', configLines, 60));
+  const ln = (s: string) => `│${pad(s, inner)}│`;
+
+  const lines: string[] = [];
+  lines.push(`┌ CONFIG ${'─'.repeat(inner - 8)}┐`);
+
+  for (const raw of config.split('\n')) {
+    if (raw.startsWith('#')) {
+      lines.push(ln(chalk.gray(` ${raw}`)));
+    } else {
+      lines.push(ln(` ${raw}`));
+    }
+  }
+
+  lines.push(`└${'─'.repeat(inner)}┘`);
+  console.log(lines.join('\n'));
+}
+
+function pad(str: string, width: number): string {
+  const plain = str.replace(/\x1b\[\d*(;\d+)*m/g, '');
+  const padding = Math.max(0, width - plain.length);
+  return str + ' '.repeat(padding);
 }

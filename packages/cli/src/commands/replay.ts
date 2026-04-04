@@ -2,7 +2,6 @@ import { type Mission, type Signal } from '@swarm/core';
 import chalk from 'chalk';
 import { loadProjectContext } from '../context.js';
 import { formatTimestamp } from '../format.js';
-import { renderBox, renderDivider, padRight } from '../ui/layout.js';
 
 export interface ReplayData {
   mission: Mission | undefined;
@@ -19,49 +18,47 @@ export function getReplay(projectDir: string, missionId: string): ReplayData {
 
 export function printReplay(projectDir: string, missionId: string): void {
   const { mission, signals } = getReplay(projectDir, missionId);
+  const w = 64;
+  const inner = w - 2;
 
-  const w = 72;
+  const ln = (s: string) => `│${pad(s, inner)}│`;
 
   if (!mission) {
-    console.log(renderBox('REPLAY', [chalk.red(` Mission "${missionId}" not found.`)], w));
+    const lines = [
+      `┌ REPLAY ${'─'.repeat(inner - 8)}┐`,
+      ln(chalk.red(` Mission "${missionId}" not found.`)),
+      `└${'─'.repeat(inner)}┘`,
+    ];
+    console.log(lines.join('\n'));
     return;
   }
 
-  const statusIcon = mission.status === 'completed' ? chalk.green('●')
+  const icon = mission.status === 'completed' ? chalk.green('●')
     : mission.status === 'failed' ? chalk.red('●')
     : chalk.gray('○');
 
-  const headerLines: string[] = [
-    ` ${mission.description}`,
-    ` ${statusIcon} ${mission.status}  ${chalk.gray(formatTimestamp(mission.createdAt))}  ${chalk.gray(`${signals.length} signals`)}`,
-  ];
+  const lines: string[] = [];
+  lines.push(`┌ REPLAY ${'─'.repeat(inner - 8)}┐`);
+  lines.push(ln(` ${mission.description}`));
+  lines.push(ln(` ${icon} ${mission.status}  ${chalk.gray(formatTimestamp(mission.createdAt))}  ${chalk.gray(`${signals.length} signals`)}`));
+  lines.push(`├${'─'.repeat(inner)}┤`);
 
-  const signalLines: string[] = [];
   for (const signal of signals) {
     const time = new Date(signal.timestamp).toLocaleTimeString('en-US', {
       hour12: false, hour: '2-digit', minute: '2-digit', second: '2-digit',
     });
-
     const prefix = signal.severity === 'critical' ? chalk.red('!')
       : signal.severity === 'warning' ? chalk.yellow('~')
       : chalk.gray('·');
-
-    signalLines.push(` ${prefix} ${chalk.gray(time)} ${chalk.cyan(`[${signal.source}]`)} ${signal.topic}`);
+    lines.push(ln(` ${prefix} ${chalk.gray(time)} ${chalk.cyan(`[${signal.source}]`)} ${signal.topic}`));
   }
 
-  // Build the full output manually for the divider
-  const inner = w - 2;
-  const top = `┌ REPLAY ${'─'.repeat(inner - 8)}┐`;
-  const divider = renderDivider(w);
-  const bottom = `└${'─'.repeat(inner)}┘`;
+  lines.push(`└${'─'.repeat(inner)}┘`);
+  console.log(lines.join('\n'));
+}
 
-  const allLines = [
-    top,
-    ...headerLines.map((l) => `│${padRight(l, inner)}│`),
-    divider,
-    ...signalLines.map((l) => `│${padRight(l, inner)}│`),
-    bottom,
-  ];
-
-  console.log(allLines.join('\n'));
+function pad(str: string, width: number): string {
+  const plain = str.replace(/\x1b\[\d*(;\d+)*m/g, '');
+  const padding = Math.max(0, width - plain.length);
+  return str + ' '.repeat(padding);
 }

@@ -2,7 +2,7 @@ import { type MemoryEntry, type MemoryLayerName } from '@swarm/core';
 import chalk from 'chalk';
 import { loadProjectContext } from '../context.js';
 import { formatTimestamp } from '../format.js';
-import { renderBox, renderDivider, padRight } from '../ui/layout.js';
+import { padRight } from '../ui/layout.js';
 
 export interface MemoryListing {
   short: MemoryEntry[];
@@ -37,18 +37,23 @@ export function forgetMemory(projectDir: string, key: string, layer: MemoryLayer
 export function printMemory(projectDir: string, layer?: MemoryLayerName): void {
   const listing = listMemory(projectDir, layer);
   const total = listing.short.length + listing.working.length + listing.long.length;
-  const w = 70;
+  const w = 64;
+  const inner = w - 2;
+
+  const ln = (s: string) => `│${pad(s, inner)}│`;
 
   if (total === 0) {
-    console.log(renderBox('MEMORY', [chalk.gray(' No memory entries. Memory is populated as missions run.')], w));
+    const lines = [
+      `┌ MEMORY ${'─'.repeat(inner - 8)}┐`,
+      ln(chalk.gray(' No memory entries. Memory is populated as missions run.')),
+      `└${'─'.repeat(inner)}┘`,
+    ];
+    console.log(lines.join('\n'));
     return;
   }
 
-  const inner = w - 2;
-  const allLines: string[] = [];
-
-  const top = `┌ MEMORY ${'─'.repeat(inner - 8)}┐`;
-  allLines.push(top);
+  const lines: string[] = [];
+  lines.push(`┌ MEMORY ${'─'.repeat(inner - 8)}┐`);
 
   const layerData: [string, MemoryEntry[]][] = [
     ['Short-term', listing.short],
@@ -59,19 +64,22 @@ export function printMemory(projectDir: string, layer?: MemoryLayerName): void {
   let first = true;
   for (const [name, entries] of layerData) {
     if (entries.length === 0) continue;
-
-    if (!first) allLines.push(renderDivider(w));
+    if (!first) lines.push(`├${'─'.repeat(inner)}┤`);
     first = false;
 
-    allLines.push(`│${padRight(chalk.bold(` ${name} (${entries.length})`), inner)}│`);
-
+    lines.push(ln(chalk.bold(` ${name} (${entries.length})`)));
     for (const e of entries) {
-      const val = e.value.length > 30 ? e.value.slice(0, 27) + '...' : e.value;
-      const line = ` ${padRight(e.key, 25)}  ${padRight(val, 30)}`;
-      allLines.push(`│${padRight(line, inner)}│`);
+      const val = padRight(e.value, 28);
+      lines.push(ln(` ${padRight(e.key, 22)}  ${val}`));
     }
   }
 
-  allLines.push(`└${'─'.repeat(inner)}┘`);
-  console.log(allLines.join('\n'));
+  lines.push(`└${'─'.repeat(inner)}┘`);
+  console.log(lines.join('\n'));
+}
+
+function pad(str: string, width: number): string {
+  const plain = str.replace(/\x1b\[\d*(;\d+)*m/g, '');
+  const padding = Math.max(0, width - plain.length);
+  return str + ' '.repeat(padding);
 }
