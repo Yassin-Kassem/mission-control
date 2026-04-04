@@ -7,6 +7,7 @@ import { printStatus } from './commands/status.js';
 import { printHistory } from './commands/history.js';
 import { printReplay } from './commands/replay.js';
 import { printDroneList, printDroneInfo } from './commands/drone.js';
+import { printDroneExec } from './commands/drone-exec.js';
 import { printMemory, promoteMemory, forgetMemory } from './commands/memory.js';
 import { printConfig } from './commands/config.js';
 import { printAnalysis } from './commands/analyze.js';
@@ -93,6 +94,19 @@ droneCmd
   .argument('[dir]', 'Project directory', process.cwd())
   .action((name: string, dir: string) => {
     printDroneInfo(dir, name);
+  });
+
+droneCmd
+  .command('exec')
+  .description('Execute a tool drone (non-AI)')
+  .argument('<name>', 'Drone name (scout|tester|security)')
+  .action(async (name: string) => {
+    try {
+      await printDroneExec(name, process.cwd());
+    } catch (err) {
+      console.error((err as Error).message);
+      process.exit(1);
+    }
   });
 
 const memoryCmd = program
