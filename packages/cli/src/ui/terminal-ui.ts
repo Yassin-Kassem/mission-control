@@ -42,6 +42,11 @@ export class TerminalUI {
   }
 
   start(): void {
+    // Switch to alternate screen buffer (like vim/less)
+    this.write('\x1b[?1049h');
+    // Hide cursor
+    this.write('\x1b[?25l');
+
     this.handler = (signal: Signal) => {
       if (signal.missionId !== this.missionId) return;
       this.processSignal(signal);
@@ -56,6 +61,10 @@ export class TerminalUI {
       this.bus.off('*', this.handler);
       this.handler = null;
     }
+    // Show cursor
+    this.write('\x1b[?25h');
+    // Switch back to main screen buffer (restores terminal history)
+    this.write('\x1b[?1049l');
   }
 
   render(): void {
@@ -120,9 +129,8 @@ export class TerminalUI {
 
     const output = lines.join('\n') + '\n';
 
-    if (this.frameCount > 1) {
-      this.write(`\x1b[${lines.length}A\x1b[0J`);
-    }
+    // Move cursor to top-left and clear screen, then draw
+    this.write('\x1b[H\x1b[2J');
     this.write(output);
   }
 
