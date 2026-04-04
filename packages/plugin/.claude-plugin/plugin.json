@@ -1,17 +1,21 @@
 {
   "name": "mission-control",
-  "version": "0.0.1",
-  "description": "Mission Control — adaptive AI orchestration framework for Claude Code",
+  "version": "0.1.0",
+  "description": "Mission Control — adaptive AI orchestration framework. Self-organizing drone swarms that scale from zero overhead on typos to full mission planning on epics.",
   "author": {
-    "name": "Yassin"
+    "name": "Yassin Kassem"
   },
+  "repository": "https://github.com/Yassin-Kassem/mission-control",
+  "homepage": "https://github.com/Yassin-Kassem/mission-control",
   "license": "MIT",
   "keywords": [
     "orchestration",
     "drones",
     "mission",
     "adaptive",
-    "mission-control"
+    "swarm",
+    "claude-code",
+    "ai-agents"
   ],
   "skills": "./skills/",
   "hooks": "./hooks/hooks.json"

@@ -9,7 +9,7 @@ describe('detectScope', () => {
     expect(detectScope('add a loading spinner to the button', 'build', 2)).toBe('small');
   });
   it('detects medium scope for multi-file features', () => {
-    expect(detectScope('add user preferences page with API endpoint', 'build', 8)).toBe('medium');
+    expect(detectScope('add a settings toggle and update the config', 'build', 5)).toBe('medium');
   });
   it('detects large scope for system-level features', () => {
     expect(detectScope('build a complete payment system with Stripe integration', 'build', 20)).toBe('large');

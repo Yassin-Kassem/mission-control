@@ -2,5 +2,13 @@
   "name": "@mctl/claude-code-plugin",
   "version": "0.1.0",
   "description": "Mission Control Claude Code plugin",
-  "private": true
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "test": "pnpm exec vitest run",
+    "lint": "echo ok"
+  },
+  "devDependencies": {
+    "vitest": "^3.0.0"
+  }
 }

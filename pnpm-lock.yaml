@@ -74,7 +74,11 @@ importers:
         specifier: ^3.0.0
         version: 3.2.4(@types/node@25.5.2)(yaml@2.8.3)
 
-  packages/plugin: {}
+  packages/plugin:
+    devDependencies:
+      vitest:
+        specifier: ^3.0.0
+        version: 3.2.4(@types/node@25.5.2)(yaml@2.8.3)
 
   packages/sdk:
     dependencies:

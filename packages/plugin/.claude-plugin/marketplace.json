@@ -1,0 +1,30 @@
+{
+  "$schema": "https://anthropic.com/claude-code/marketplace.schema.json",
+  "name": "mission-control",
+  "description": "Mission Control — adaptive AI orchestration framework. Self-organizing drone swarms that scale from zero overhead on typos to full mission planning on epics.",
+  "owner": {
+    "name": "Yassin Kassem",
+    "email": ""
+  },
+  "plugins": [
+    {
+      "name": "mission-control",
+      "source": "./",
+      "version": "0.1.0",
+      "description": "Adaptive AI orchestration with self-organizing drone swarms. Scales from solo mode for typos to full swarm planning for epics. Includes scout, architect, coder, tester, security, reviewer, debugger, and docs drones with signal-based communication and three-layer memory.",
+      "author": {
+        "name": "Yassin Kassem"
+      },
+      "homepage": "https://github.com/Yassin-Kassem/mission-control",
+      "category": "development",
+      "keywords": [
+        "orchestration",
+        "ai-agents",
+        "drones",
+        "adaptive",
+        "swarm",
+        "mission-control"
+      ]
+    }
+  ]
+}

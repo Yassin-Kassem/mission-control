@@ -7,21 +7,36 @@ description: Use when the user asks to build, fix, debug, refactor, or deploy so
 
 Orchestrate a mission with the Mission Control framework. AI drones run as isolated subagents. Communication is through `.mctl/mission/` files. You (parent) stay lean — dispatch, collect one-line status, report.
 
-## How to Run Mission Control Commands
+## Setup
+
+Mission Control CLI must be available. Run this **once** at the start:
 
 ```bash
-MISSION="bash ${CLAUDE_PLUGIN_ROOT}/bin/mission"
+# Check if mission CLI is available
+npx @mctl/cli --version 2>/dev/null || echo "INSTALL_NEEDED"
 ```
 
-Fallback: `MISSION="bash $(find ~/.claude/plugins -path '*/mission-control/bin/mission' -print -quit 2>/dev/null)"`
+**If INSTALL_NEEDED:** Tell the user: "Mission Control CLI is not installed. Run `npm install -g @mctl/cli` to install it, or I can use `npx` to run it on-the-fly."
 
-**NEVER:** `npx mission`, `node .../bin/mission`, `mission` directly.
+All CLI commands use this pattern:
+```bash
+npx @mctl/cli <command> [args]
+```
 
-## Step 1: Analyze + Mode Selection
+If the user has it installed globally, `mission <command>` also works. Prefer `npx @mctl/cli` for portability.
+
+## Step 1: Initialize (if needed)
 
 ```bash
-$MISSION analyze "$ARGUMENTS" --mode copilot > .mctl/mission/analysis.json
+# Check if project is initialized
+test -d .mctl || npx @mctl/cli init
+```
+
+## Step 2: Analyze + Mode Selection
+
+```bash
 mkdir -p .mctl/mission
+npx @mctl/cli analyze "$ARGUMENTS" --mode copilot > .mctl/mission/analysis.json
 ```
 
 Parse the JSON. Present to user:
@@ -39,29 +54,29 @@ Parse the JSON. Present to user:
 
 Default to **copilot**. For **trivial/small scope**, force **solo**.
 
-## Step 2: Pre-Mission Snapshot
+## Step 3: Pre-Mission Snapshot
 
 ```bash
 git tag "mission-pre-$(cat .mctl/mission/analysis.json | grep missionId | head -1 | sed 's/.*: "//;s/".*//')" 2>/dev/null || true
 ```
 
-Creates a rollback point. User can undo everything with `mission rollback <mission-id>`.
+Creates a rollback point. User can undo everything with `npx @mctl/cli rollback <mission-id>`.
 
-## Step 3: Check Memory
+## Step 4: Check Memory
 
 ```bash
-$MISSION memory show 2>/dev/null
+npx @mctl/cli memory show 2>/dev/null
 ```
 
 If memory has project info (languages, frameworks, past corrections), include relevant entries in subagent prompts. This makes drones smarter on repeat missions.
 
-## Step 4: Scout (tool — zero tokens)
+## Step 5: Scout (tool — zero tokens)
 
 ```bash
-$MISSION drone exec scout > .mctl/mission/scout.json
+npx @mctl/cli drone exec scout > .mctl/mission/scout.json
 ```
 
-## Step 5: Architect + Plan (subagent)
+## Step 6: Architect + Plan (subagent)
 
 **Skip for solo mode or trivial/small scope.**
 
@@ -99,7 +114,7 @@ Agent tool:
 **Copilot/Step-by-step:** Read `.mctl/mission/plan.md`, show to user, wait for approval.
 **Autopilot/Blitz:** Continue immediately.
 
-## Step 6: Coder (subagent)
+## Step 7: Coder (subagent)
 
 ```
 Agent tool:
@@ -116,11 +131,6 @@ Agent tool:
     Follow the plan step by step. Write clean code. Match existing patterns.
     Write tests alongside code. Commit after each logical unit.
 
-    Test commands:
-    - Package files: `pnpm test`
-    - Root files: `pnpm exec vitest run tests/<file>.test.ts`
-    - NEVER: npx vitest, turbo test, node_modules/.bin/vitest
-
     Write summary to .mctl/mission/coder.md:
     ## Changes
     - [file]: [what changed]
@@ -132,10 +142,10 @@ Agent tool:
 
 **Copilot:** Show changes summary to user after coder finishes.
 
-## Step 7: Test + Self-Healing Loop
+## Step 8: Test + Self-Healing Loop
 
 ```bash
-$MISSION drone exec tester > .mctl/mission/tester.json
+npx @mctl/cli drone exec tester > .mctl/mission/tester.json
 ```
 
 **If tests fail (max 2 retries):**
@@ -149,19 +159,19 @@ Agent tool:
     - .mctl/mission/tester.json (test output)
     - .mctl/mission/coder.md (what was changed)
 
-    Fix the issues. Test with: `pnpm test` or `pnpm exec vitest run tests/<file>.test.ts`
+    Fix the issues. Run tests to verify your fix.
     Report: what was wrong + what you fixed.
 ```
 
-Re-run `$MISSION drone exec tester` after each fix. If still failing after 2 retries, report to user.
+Re-run `npx @mctl/cli drone exec tester` after each fix. If still failing after 2 retries, report to user.
 
-## Step 8: Security (tool)
+## Step 9: Security (tool)
 
 ```bash
-$MISSION drone exec security > .mctl/mission/security.json
+npx @mctl/cli drone exec security > .mctl/mission/security.json
 ```
 
-## Step 9: Review + Self-Healing Loop
+## Step 10: Review + Self-Healing Loop
 
 ```
 Agent tool:
@@ -189,7 +199,7 @@ Agent tool:
     Fix each issue. Report what you fixed.
 ```
 
-## Step 10: Learn + Report
+## Step 11: Learn + Report
 
 Mission Control learns from every mission. After completion, key findings get stored in memory for future missions.
 
@@ -205,11 +215,11 @@ Report to user:
 | security  | N vulnerabilities                 |
 | reviewer  | [clean or findings]               |
 
-Snapshot: mission-pre-[id] (mission rollback [id] to undo)
+Snapshot: mission-pre-[id] (npx @mctl/cli rollback [id] to undo)
 ```
 
 **If mission had failures:**
-> Some drones had issues. Run `mission rollback [mission-id]` to undo all changes?
+> Some drones had issues. Run `npx @mctl/cli rollback [mission-id]` to undo all changes?
 
 ## Mode Behavior Summary
 
@@ -229,9 +239,3 @@ Snapshot: mission-pre-[id] (mission rollback [id] to undo)
 4. Model selection: architect/coder=sonnet, reviewer/docs=haiku, debugger=opus
 5. Trivial/small = solo mode, zero subagent overhead
 6. Max 4 AI subagents per mission
-
-## Running Tests
-
-**Package files:** `pnpm test`
-**Root files:** `pnpm exec vitest run tests/<file>.test.ts`
-**NEVER:** `npx vitest`, `vitest run`, `turbo test`

@@ -5,13 +5,11 @@ description: Use when the user wants to create, build, or add a custom drone for
 
 # Create a Custom Drone
 
-## How to Run Commands
+## Setup
 
 ```bash
-MISSION="bash ${CLAUDE_PLUGIN_ROOT}/bin/mission"
+npx @mctl/cli --version 2>/dev/null || echo "Run: npm install -g @mctl/cli"
 ```
-
-**NEVER:** `npx mission`, `node .../bin/mission`, `mission` directly.
 
 ## Decide: Tool or AI?
 
@@ -39,7 +37,7 @@ digraph drone_type {
 ## Step 1: Scaffold
 
 ```bash
-$MISSION drone create <name>
+npx @mctl/cli drone create <name>
 ```
 
 Creates: `drone.yaml`, `skills/main.md`, `tests/drone.test.ts`, `package.json`, `README.md`
@@ -128,13 +126,25 @@ export class LintCheckExecutor {
 
 Then export from `packages/core/src/index.ts` and add to `packages/cli/src/commands/drone-exec.ts`.
 
-## Step 5: Run Tests
+## Step 5: Test
 
 ```bash
-cd <name> && pnpm exec vitest run
+# Install the drone locally
+npx @mctl/cli drone add ./<name>
+
+# Verify it shows in fleet
+npx @mctl/cli drone list
+npx @mctl/cli drone info <name>
 ```
 
-**NEVER:** `npx vitest run` (not in PATH at root level)
+## Step 6: Share
+
+```bash
+# Push to GitHub
+cd <name> && git init && git add . && git commit -m "Initial drone"
+# Others install with:
+# git clone <url> && npx @mctl/cli drone add ./<name>
+```
 
 ## Common Mistakes
 
@@ -145,4 +155,3 @@ cd <name> && pnpm exec vitest run
 | Forgetting `.mctl/mission/` output | Every drone must write its results to `.mctl/mission/<name>.md` |
 | Setting priority wrong | Higher = runs earlier. Match to dependency order. |
 | Not adding `listens` signals | If your drone depends on coder finishing, add `coder.done` to listens |
-| Using `npx vitest` | Use `pnpm exec vitest run` |
