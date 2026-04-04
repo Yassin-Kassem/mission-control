@@ -1,6 +1,8 @@
 import { type MemoryEntry, type MemoryLayerName } from '@swarm/core';
+import chalk from 'chalk';
 import { loadProjectContext } from '../context.js';
-import { formatTable, formatTimestamp } from '../format.js';
+import { formatTimestamp } from '../format.js';
+import { renderBox, renderDivider, padRight } from '../ui/layout.js';
 
 export interface MemoryListing {
   short: MemoryEntry[];
@@ -34,23 +36,42 @@ export function forgetMemory(projectDir: string, key: string, layer: MemoryLayer
 
 export function printMemory(projectDir: string, layer?: MemoryLayerName): void {
   const listing = listMemory(projectDir, layer);
-  const layers: [string, MemoryEntry[]][] = [
+  const total = listing.short.length + listing.working.length + listing.long.length;
+  const w = 70;
+
+  if (total === 0) {
+    console.log(renderBox('MEMORY', [chalk.gray(' No memory entries. Memory is populated as missions run.')], w));
+    return;
+  }
+
+  const inner = w - 2;
+  const allLines: string[] = [];
+
+  const top = `┌ MEMORY ${'─'.repeat(inner - 8)}┐`;
+  allLines.push(top);
+
+  const layerData: [string, MemoryEntry[]][] = [
     ['Short-term', listing.short],
     ['Working', listing.working],
     ['Long-term', listing.long],
   ];
-  for (const [name, entries] of layers) {
+
+  let first = true;
+  for (const [name, entries] of layerData) {
     if (entries.length === 0) continue;
-    console.log(`\n${name} Memory (${entries.length} entries)\n`);
-    const rows: string[][] = [['Key', 'Value', 'Updated']];
+
+    if (!first) allLines.push(renderDivider(w));
+    first = false;
+
+    allLines.push(`│${padRight(chalk.bold(` ${name} (${entries.length})`), inner)}│`);
+
     for (const e of entries) {
-      const val = e.value.length > 50 ? e.value.slice(0, 47) + '...' : e.value;
-      rows.push([e.key, val, formatTimestamp(e.updatedAt)]);
+      const val = e.value.length > 30 ? e.value.slice(0, 27) + '...' : e.value;
+      const line = ` ${padRight(e.key, 25)}  ${padRight(val, 30)}`;
+      allLines.push(`│${padRight(line, inner)}│`);
     }
-    console.log(formatTable(rows));
   }
-  const total = listing.short.length + listing.working.length + listing.long.length;
-  if (total === 0) {
-    console.log('No memory entries. Memory is populated as missions run.');
-  }
+
+  allLines.push(`└${'─'.repeat(inner)}┘`);
+  console.log(allLines.join('\n'));
 }

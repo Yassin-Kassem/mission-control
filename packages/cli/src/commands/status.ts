@@ -1,6 +1,8 @@
 import { type Mission } from '@swarm/core';
+import chalk from 'chalk';
 import { loadProjectContext } from '../context.js';
-import { formatStatus, formatTimestamp, formatTable } from '../format.js';
+import { formatStatus, formatTimestamp } from '../format.js';
+import { renderBox, renderDivider, padRight } from '../ui/layout.js';
 
 export interface SwarmStatus {
   totalMissions: number;
@@ -29,21 +31,28 @@ export function getStatus(projectDir: string): SwarmStatus {
 
 export function printStatus(projectDir: string): void {
   const status = getStatus(projectDir);
-  console.log('Swarm Status');
-  console.log('============\n');
-  console.log(`Missions: ${status.totalMissions} total`);
+  const w = 60;
+  const inner = w - 2;
+
+  const lines: string[] = [];
+
   if (status.latestMission) {
-    console.log(`Latest:   ${formatStatus(status.latestMission.status)} — "${status.latestMission.description}"`);
-    console.log(`          ${formatTimestamp(status.latestMission.createdAt)}`);
+    lines.push(` Missions:  ${chalk.bold(String(status.totalMissions))} total`);
+    lines.push(` Latest:    ${formatStatus(status.latestMission.status)}`);
+    lines.push(`            "${status.latestMission.description}"`);
+    lines.push(`            ${chalk.gray(formatTimestamp(status.latestMission.createdAt))}`);
   } else {
-    console.log('Latest:   No missions yet');
+    lines.push(` Missions:  ${chalk.gray('none yet')}`);
   }
-  console.log(`\nMemory:`);
-  console.log(formatTable([
-    ['Layer', 'Entries'],
-    ['short-term', String(status.memoryStats.short)],
-    ['working', String(status.memoryStats.working)],
-    ['long-term', String(status.memoryStats.long)],
-  ]));
-  console.log(`\nDrones: ${status.registeredDrones} registered`);
+
+  lines.push('');
+  lines.push(chalk.bold(' Memory'));
+  lines.push(`  short-term  ${chalk.bold(String(status.memoryStats.short))} entries`);
+  lines.push(`  working     ${chalk.bold(String(status.memoryStats.working))} entries`);
+  lines.push(`  long-term   ${chalk.bold(String(status.memoryStats.long))} entries`);
+
+  lines.push('');
+  lines.push(` Drones:    ${chalk.bold(String(status.registeredDrones))} registered`);
+
+  console.log(renderBox('SWARM STATUS', lines, w));
 }
