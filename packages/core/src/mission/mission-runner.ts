@@ -14,13 +14,14 @@ export interface MissionRunnerConfig {
   missionStore: MissionStore;
   checkpoints: CheckpointManager;
   planner: MissionPlanner;
-  resolveExecutor: (droneName: string) => DroneExecutor;
+  resolveExecutor: (droneName: string, manifest: DroneManifest) => DroneExecutor;
 }
 
 export interface MissionResult {
   status: 'completed' | 'failed';
   failedDrones: string[];
   completedDrones: string[];
+  skippedDrones: string[];
 }
 
 export class MissionRunner {
@@ -50,6 +51,7 @@ export class MissionRunner {
 
     const completedDrones: string[] = [];
     const failedDrones: string[] = [];
+    const skippedDrones: string[] = [];
 
     const groups = new Map<number, typeof plan.steps>();
     for (const step of plan.steps) {
@@ -64,16 +66,18 @@ export class MissionRunner {
       const results = await Promise.all(
         groupSteps.map(async (step) => {
           const manifest = drones.find((d) => d.name === step.droneName);
-          if (!manifest) return { name: step.droneName, success: false };
-          const executor = this.config.resolveExecutor(manifest.name);
+          if (!manifest) return { name: step.droneName, success: false, skipped: true };
+
+          const executor = this.config.resolveExecutor(manifest.name, manifest);
           const droneRunner = new DroneRunner(manifest, executor, bus, missionId);
           droneRunner.activate();
           await droneRunner.run();
-          return { name: manifest.name, success: droneRunner.state === 'done' };
+          return { name: manifest.name, success: droneRunner.state === 'done', skipped: false };
         }),
       );
       for (const r of results) {
-        if (r.success) completedDrones.push(r.name);
+        if (r.skipped) skippedDrones.push(r.name);
+        else if (r.success) completedDrones.push(r.name);
         else failedDrones.push(r.name);
       }
     }
@@ -93,9 +97,9 @@ export class MissionRunner {
     bus.emit(createSignal({
       type: 'progress', source: 'mission-runner', topic: 'mission.completed',
       severity: failedDrones.length ? 'warning' : 'info',
-      payload: { missionId, completedDrones, failedDrones }, missionId,
+      payload: { missionId, completedDrones, failedDrones, skippedDrones }, missionId,
     }));
 
-    return { status: 'completed', failedDrones, completedDrones };
+    return { status: 'completed', failedDrones, completedDrones, skippedDrones };
   }
 }

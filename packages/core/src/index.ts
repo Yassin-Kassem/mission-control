@@ -13,7 +13,7 @@ export { MemoryManager } from './memory/memory-manager.js';
 export { MemoryPromoter } from './memory/memory-promoter.js';
 
 // Drones
-export { type DroneManifest, type DroneTriggers, type DroneOpinions, type DroneSignals, parseDroneManifest, validateManifest } from './drones/drone-manifest.js';
+export { type DroneManifest, type DroneType, type DroneTriggers, type DroneOpinions, type DroneSignals, parseDroneManifest, validateManifest } from './drones/drone-manifest.js';
 export { DroneRegistry } from './drones/drone-registry.js';
 export { DroneRunner, DroneState, type DroneExecutor, type DroneResult } from './drones/drone-runner.js';
 
@@ -29,6 +29,10 @@ export { type Mission, type MissionPhase, type MissionStatus, createMissionId } 
 export { MissionStore } from './mission/mission-store.js';
 export { MissionPlanner, type MissionPlan, type PlanStep } from './mission/mission-planner.js';
 export { MissionRunner, type MissionRunnerConfig, type MissionResult } from './mission/mission-runner.js';
+
+// Drone Prompt Builder
+export { DronePromptBuilder, type DispatchPrompt, type MissionDispatchPlan } from './drones/prompt-builder.js';
+export { loadBuiltinDrones, loadBuiltinSkill, type BuiltinDrone } from './drones/builtin-loader.js';
 
 // Executors
 export { ScoutExecutor } from './drones/executors/scout-executor.js';

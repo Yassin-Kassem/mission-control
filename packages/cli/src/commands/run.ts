@@ -1,4 +1,4 @@
-import { createMissionId, MissionRunner, MissionLearner, type DroneExecutor, ScoutExecutor, TesterExecutor, SecurityExecutor } from '@mctl/core';
+import { createMissionId, MissionRunner, MissionLearner, type DroneExecutor, type DroneManifest, ScoutExecutor, TesterExecutor, SecurityExecutor } from '@mctl/core';
 import { DashboardServer } from '../dashboard/server.js';
 import { loadProjectContext } from '../context.js';
 import { TerminalUI } from '../ui/terminal-ui.js';
@@ -57,24 +57,42 @@ export async function runMission(description: string, projectDir: string, option
   const runner = new MissionRunner({
     bus: ctx.bus, memory: ctx.memory, missionStore: ctx.missionStore,
     checkpoints: ctx.checkpoints, planner: ctx.planner,
-    resolveExecutor: (droneName: string): DroneExecutor => {
-      switch (droneName) {
-        case 'scout':
-          return new ScoutExecutor(projectDir);
-        case 'tester':
-          return new TesterExecutor(projectDir);
-        case 'security':
-          return new SecurityExecutor(projectDir);
-        default:
-          // AI drones use placeholder when running outside Claude Code
-          return {
-            async execute() {
-              const delay = 300 + Math.random() * 500;
-              await new Promise((resolve) => setTimeout(resolve, delay));
-              return { summary: `${droneName} requires Claude Code for full execution` };
-            },
-          };
+    resolveExecutor: (droneName: string, manifest: DroneManifest): DroneExecutor => {
+      // Tool drones have real executors
+      if (manifest.type === 'tool') {
+        switch (droneName) {
+          case 'scout':
+            return new ScoutExecutor(projectDir);
+          case 'tester':
+            return new TesterExecutor(projectDir);
+          case 'security':
+            return new SecurityExecutor(projectDir);
+        }
       }
+
+      // AI drones: when run from CLI (outside Claude Code), generate prompt info
+      // Inside Claude Code, the plugin skill uses `dispatch` command instead
+      if (manifest.type === 'ai') {
+        return {
+          async execute() {
+            const prompt = ctx.promptBuilder.buildPrompt(manifest, description);
+            return {
+              summary: `[AI drone] ${manifest.name} ready — use 'mission dispatch' inside Claude Code to execute with real subagents`,
+              type: 'ai',
+              model: prompt.model,
+              inputFiles: prompt.inputs,
+              outputFiles: prompt.outputs,
+            };
+          },
+        };
+      }
+
+      // Unknown drone type
+      return {
+        async execute() {
+          return { summary: `${droneName}: no executor available` };
+        },
+      };
     },
   });
 

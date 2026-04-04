@@ -8,3 +8,7 @@ dist/
 coverage/
 .turbo/
 .claude/
+
+# Mission Control
+.mctl/memory.db
+.mctl/checkpoints/

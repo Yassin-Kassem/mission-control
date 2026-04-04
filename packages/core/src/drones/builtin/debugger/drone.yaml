@@ -1,0 +1,21 @@
+name: debugger
+description: Systematic root-cause analysis for bugs and failures
+type: ai
+model: sonnet
+priority: 85
+escalation: user
+
+triggers:
+  keywords: [bug, error, debug, crash, failing, broken]
+
+opinions:
+  requires: []
+  suggests: []
+  blocks: []
+
+signals:
+  emits: [debugger.done]
+  listens: []
+
+inputs: [scout.json]
+outputs: [debugger.md]

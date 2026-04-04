@@ -1,0 +1,19 @@
+name: scout
+description: Explores codebase structure, detects languages, frameworks, and test runners
+type: tool
+priority: 100
+escalation: user
+
+triggers: {}
+
+opinions:
+  requires: []
+  suggests: []
+  blocks: []
+
+signals:
+  emits: [scout.done]
+  listens: []
+
+inputs: []
+outputs: [scout.json]

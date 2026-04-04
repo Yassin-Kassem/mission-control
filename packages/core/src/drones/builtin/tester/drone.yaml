@@ -1,0 +1,19 @@
+name: tester
+description: Runs the project test suite and reports pass/fail results
+type: tool
+priority: 40
+escalation: user
+
+triggers: {}
+
+opinions:
+  requires: [test coverage]
+  suggests: []
+  blocks: []
+
+signals:
+  emits: [tester.done]
+  listens: [coder.done]
+
+inputs: []
+outputs: [tester.json]

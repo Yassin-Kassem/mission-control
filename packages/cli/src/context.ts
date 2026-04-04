@@ -2,6 +2,7 @@ import {
   createDatabase, type SwarmDatabase, SignalBus, SignalStore, MemoryManager,
   MissionStore, MissionPlanner, CheckpointManager, ContextAnalyzer,
   DroneRegistry, type DroneManifest, parseDroneManifest,
+  DronePromptBuilder, loadBuiltinDrones,
 } from '@mctl/core';
 import path from 'path';
 import fs from 'fs';
@@ -17,6 +18,7 @@ export interface ProjectContext {
   registry: DroneRegistry;
   planner: MissionPlanner;
   analyzer: ContextAnalyzer;
+  promptBuilder: DronePromptBuilder;
   close(): void;
 }
 
@@ -35,14 +37,24 @@ export function loadProjectContext(projectDir: string): ProjectContext {
   const checkpoints = new CheckpointManager(db);
   const registry = new DroneRegistry();
   const planner = new MissionPlanner();
+  const promptBuilder = new DronePromptBuilder();
 
-  for (const drone of getBuiltinDrones()) {
-    registry.register(drone);
+  // Load built-in drones from YAML manifests + skill files
+  const builtins = loadBuiltinDrones();
+  for (const drone of builtins) {
+    registry.register(drone.manifest);
+    if (drone.skill) {
+      promptBuilder.registerSkill(drone.manifest.name, drone.skill);
+    }
   }
 
+  // Load community drones
   for (const drone of loadCommunityDrones(projectDir)) {
-    if (!registry.get(drone.name)) {
-      registry.register(drone);
+    if (!registry.get(drone.manifest.name)) {
+      registry.register(drone.manifest);
+      if (drone.skill) {
+        promptBuilder.registerSkill(drone.manifest.name, drone.skill);
+      }
     }
   }
 
@@ -51,16 +63,21 @@ export function loadProjectContext(projectDir: string): ProjectContext {
   return {
     projectDir,
     db, bus, signalStore, memory, missionStore, checkpoints,
-    registry, planner, analyzer,
+    registry, planner, analyzer, promptBuilder,
     close() { db.close(); },
   };
 }
 
-function loadCommunityDrones(projectDir: string): DroneManifest[] {
+interface LoadedDrone {
+  manifest: DroneManifest;
+  skill?: string;
+}
+
+function loadCommunityDrones(projectDir: string): LoadedDrone[] {
   const dronesDir = path.join(projectDir, '.mctl', 'drones');
   if (!fs.existsSync(dronesDir)) return [];
 
-  const drones: DroneManifest[] = [];
+  const drones: LoadedDrone[] = [];
   const entries = fs.readdirSync(dronesDir, { withFileTypes: true });
 
   for (const entry of entries) {
@@ -71,24 +88,19 @@ function loadCommunityDrones(projectDir: string): DroneManifest[] {
     try {
       const content = fs.readFileSync(manifestPath, 'utf-8');
       const manifest = parseDroneManifest(content);
-      if (manifest.name) drones.push(manifest);
+      if (!manifest.name) continue;
+
+      let skill: string | undefined;
+      const skillPath = path.join(dronesDir, entry.name, 'skills', 'main.md');
+      if (fs.existsSync(skillPath)) {
+        skill = fs.readFileSync(skillPath, 'utf-8');
+      }
+
+      drones.push({ manifest, skill });
     } catch {
       // Skip invalid drones
     }
   }
 
   return drones;
-}
-
-function getBuiltinDrones(): DroneManifest[] {
-  return [
-    { name: 'scout', description: 'Explores codebase, maps context', triggers: {}, opinions: { requires: [], suggests: [], blocks: [] }, signals: { emits: ['scout.done'], listens: [] }, priority: 100, escalation: 'user' },
-    { name: 'architect', description: 'Designs system architecture', triggers: { taskSize: 'large' }, opinions: { requires: ['spec before code'], suggests: [], blocks: [] }, signals: { emits: ['architect.done'], listens: ['scout.done'] }, priority: 90, escalation: 'user' },
-    { name: 'coder', description: 'Implements code', triggers: {}, opinions: { requires: [], suggests: [], blocks: [] }, signals: { emits: ['coder.done'], listens: ['architect.done'] }, priority: 50, escalation: 'user' },
-    { name: 'tester', description: 'Writes and runs tests', triggers: {}, opinions: { requires: ['test coverage'], suggests: [], blocks: [] }, signals: { emits: ['tester.done'], listens: ['coder.done'] }, priority: 40, escalation: 'user' },
-    { name: 'debugger', description: 'Systematic root-cause analysis', triggers: { keywords: ['bug', 'error', 'debug', 'crash'] }, opinions: { requires: [], suggests: [], blocks: [] }, signals: { emits: ['debugger.done'], listens: [] }, priority: 85, escalation: 'user' },
-    { name: 'security', description: 'Flags vulnerabilities', triggers: { keywords: ['auth', 'payment', 'token', 'password', 'credential'] }, opinions: { requires: [], suggests: [], blocks: ['insecure patterns'] }, signals: { emits: ['security.done'], listens: ['scout.done'] }, priority: 80, escalation: 'user' },
-    { name: 'reviewer', description: 'Final quality check', triggers: {}, opinions: { requires: [], suggests: [], blocks: [] }, signals: { emits: ['reviewer.done'], listens: ['coder.done', 'tester.done'] }, priority: 10, escalation: 'user' },
-    { name: 'docs', description: 'Documentation generation', triggers: { taskSize: 'large' }, opinions: { requires: [], suggests: ['document public APIs'], blocks: [] }, signals: { emits: ['docs.done'], listens: ['coder.done'] }, priority: 5, escalation: 'user' },
-  ];
 }

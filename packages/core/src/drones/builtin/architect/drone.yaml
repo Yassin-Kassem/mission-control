@@ -1,0 +1,21 @@
+name: architect
+description: Designs solution architecture and writes step-by-step implementation plan
+type: ai
+model: sonnet
+priority: 90
+escalation: user
+
+triggers:
+  taskSize: large
+
+opinions:
+  requires: [spec before code]
+  suggests: []
+  blocks: []
+
+signals:
+  emits: [architect.done]
+  listens: [scout.done]
+
+inputs: [scout.json]
+outputs: [plan.md]

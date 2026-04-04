@@ -10,7 +10,7 @@
   "publishConfig": { "access": "public" },
   "keywords": ["claude", "ai", "orchestration", "mission-control", "drones"],
   "scripts": {
-    "build": "tsc",
+    "build": "tsc && node -e \"const fs=require('fs'),p=require('path');function cp(s,d){fs.mkdirSync(d,{recursive:true});for(const e of fs.readdirSync(s,{withFileTypes:true})){const sp=p.join(s,e.name),dp=p.join(d,e.name);e.isDirectory()?cp(sp,dp):fs.copyFileSync(sp,dp)}}cp('src/drones/builtin','dist/drones/builtin')\"",
     "test": "vitest run",
     "test:watch": "vitest",
     "lint": "eslint src/"

@@ -1,0 +1,20 @@
+name: coder
+description: Implements code following the architect's plan
+type: ai
+model: sonnet
+priority: 50
+escalation: user
+
+triggers: {}
+
+opinions:
+  requires: []
+  suggests: []
+  blocks: []
+
+signals:
+  emits: [coder.done]
+  listens: [architect.done]
+
+inputs: [scout.json, plan.md]
+outputs: [coder.md]

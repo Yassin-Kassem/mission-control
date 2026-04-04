@@ -1,0 +1,20 @@
+name: security
+description: Runs dependency audit to flag known vulnerabilities
+type: tool
+priority: 80
+escalation: user
+
+triggers:
+  keywords: [auth, payment, token, password, credential]
+
+opinions:
+  requires: []
+  suggests: []
+  blocks: [insecure patterns]
+
+signals:
+  emits: [security.done]
+  listens: [scout.done]
+
+inputs: []
+outputs: [security.json]

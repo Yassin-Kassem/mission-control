@@ -1,0 +1,20 @@
+name: reviewer
+description: Reviews code changes for quality, correctness, and security
+type: ai
+model: haiku
+priority: 10
+escalation: user
+
+triggers: {}
+
+opinions:
+  requires: []
+  suggests: []
+  blocks: []
+
+signals:
+  emits: [reviewer.done]
+  listens: [coder.done, tester.done]
+
+inputs: [plan.md, coder.md]
+outputs: [reviewer.md]

@@ -18,14 +18,20 @@ export interface DroneSignals {
   listens: string[];
 }
 
+export type DroneType = 'tool' | 'ai';
+
 export interface DroneManifest {
   name: string;
   description: string;
+  type: DroneType;
+  model?: string;
   triggers: DroneTriggers;
   opinions: DroneOpinions;
   signals: DroneSignals;
   priority: number;
   escalation: string;
+  inputs?: string[];   // files this drone reads from .mctl/mission/
+  outputs?: string[];  // files this drone writes to .mctl/mission/
 }
 
 export function parseDroneManifest(yamlContent: string): DroneManifest {
@@ -33,6 +39,8 @@ export function parseDroneManifest(yamlContent: string): DroneManifest {
   return {
     name: raw.name ?? '',
     description: raw.description ?? '',
+    type: raw.type ?? 'ai',
+    model: raw.model,
     triggers: raw.triggers ?? {},
     opinions: {
       requires: raw.opinions?.requires ?? [],
@@ -45,6 +53,8 @@ export function parseDroneManifest(yamlContent: string): DroneManifest {
     },
     priority: raw.priority ?? 0,
     escalation: raw.escalation ?? 'user',
+    inputs: raw.inputs ?? [],
+    outputs: raw.outputs ?? [],
   };
 }
 

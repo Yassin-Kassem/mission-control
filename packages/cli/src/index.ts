@@ -13,6 +13,7 @@ import { printConfig } from './commands/config.js';
 import { printAnalysis } from './commands/analyze.js';
 import { printBudget } from './commands/budget.js';
 import { rollbackMission as doRollback, printSnapshots } from './commands/rollback.js';
+import { generateDispatchPlan, generateDronePrompt } from './commands/dispatch.js';
 import fs from 'fs';
 import path from 'path';
 
@@ -272,6 +273,31 @@ program
   .description('List available mission snapshots')
   .action(() => {
     printSnapshots(process.cwd());
+  });
+
+program
+  .command('dispatch')
+  .description('Generate a full mission dispatch plan with drone prompts (JSON)')
+  .argument('<description>', 'Task description')
+  .option('--mode <mode>', 'Execution mode (autopilot|copilot|stepwise|blitz|solo)')
+  .option('--mission-id <id>', 'Override mission ID')
+  .action((description: string, options) => {
+    const plan = generateDispatchPlan(process.cwd(), {
+      task: description,
+      mode: options.mode,
+      missionId: options.missionId,
+    });
+    console.log(plan);
+  });
+
+program
+  .command('drone-prompt')
+  .description('Generate the dispatch prompt for a single drone (JSON)')
+  .argument('<drone>', 'Drone name')
+  .argument('<task>', 'Task description')
+  .action((drone: string, task: string) => {
+    const prompt = generateDronePrompt(process.cwd(), drone, task);
+    console.log(prompt);
   });
 
 // Global error handler — graceful messages instead of stack traces

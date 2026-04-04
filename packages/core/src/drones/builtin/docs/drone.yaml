@@ -1,0 +1,21 @@
+name: docs
+description: Generates documentation for new or changed code
+type: ai
+model: haiku
+priority: 5
+escalation: user
+
+triggers:
+  taskSize: large
+
+opinions:
+  requires: []
+  suggests: [document public APIs]
+  blocks: []
+
+signals:
+  emits: [docs.done]
+  listens: [coder.done]
+
+inputs: [coder.md]
+outputs: [docs.md]
