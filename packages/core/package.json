@@ -1,10 +1,13 @@
 {
   "name": "@mctl/core",
-  "version": "0.0.1",
-  "description": "Mission Control core engine",
+  "version": "0.1.0",
+  "description": "Mission Control core engine — signals, memory, drones, and mission lifecycle",
   "type": "module",
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
+  "files": ["dist"],
+  "license": "MIT",
+  "keywords": ["claude", "ai", "orchestration", "mission-control", "drones"],
   "scripts": {
     "build": "tsc",
     "test": "vitest run",

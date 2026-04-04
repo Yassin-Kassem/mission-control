@@ -1,10 +1,13 @@
 {
   "name": "@mctl/sdk",
-  "version": "0.0.1",
-  "description": "Mission Control Drone SDK — build custom drones",
+  "version": "0.1.0",
+  "description": "Mission Control Drone SDK — build, test, and share custom AI drones",
   "type": "module",
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
+  "files": ["dist"],
+  "license": "MIT",
+  "keywords": ["sdk", "claude", "ai", "drones", "mission-control"],
   "scripts": {
     "build": "tsc",
     "test": "vitest run",

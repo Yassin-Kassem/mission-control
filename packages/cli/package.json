@@ -1,11 +1,14 @@
 {
   "name": "@mctl/cli",
-  "version": "0.0.1",
-  "description": "Mission Control CLI",
+  "version": "0.1.0",
+  "description": "Mission Control CLI — tactical command interface for AI orchestration",
   "type": "module",
   "bin": {
     "mission": "dist/index.js"
   },
+  "files": ["dist"],
+  "license": "MIT",
+  "keywords": ["cli", "claude", "ai", "orchestration", "mission-control"],
   "scripts": {
     "build": "tsc",
     "test": "vitest run",
