@@ -1,7 +1,7 @@
 #!/usr/bin/env node
 import { Command } from 'commander';
 import { type MemoryLayerName } from '@mctl/core';
-import { initProject } from './commands/init.js';
+import { initProject, printInit } from './commands/init.js';
 import { runMission } from './commands/run.js';
 import { printStatus } from './commands/status.js';
 import { printHistory } from './commands/history.js';
@@ -28,8 +28,7 @@ program
   .description('Initialize Mission Control in the current project')
   .argument('[dir]', 'Project directory', process.cwd())
   .action((dir: string) => {
-    initProject(dir);
-    console.log('Mission Control initialized in', dir);
+    printInit(dir);
   });
 
 program

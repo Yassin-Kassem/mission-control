@@ -1,4 +1,4 @@
-import { ScoutExecutor, TesterExecutor, SecurityExecutor, type DroneResult } from '@swarm/core';
+import { ScoutExecutor, TesterExecutor, SecurityExecutor, type DroneResult } from '@mctl/core';
 
 const AI_DRONES = new Set(['architect', 'coder', 'reviewer', 'debugger', 'docs']);
 const TOOL_DRONES = new Set(['scout', 'tester', 'security']);

@@ -1,4 +1,4 @@
-import { MissionRollback } from '@swarm/core';
+import { MissionRollback } from '@mctl/core';
 
 export function createSnapshot(missionId: string, projectDir: string): string {
   const rb = new MissionRollback(projectDir);

@@ -86,5 +86,36 @@ export function analyzeMission(description: string, projectDir: string, mode = '
 
 export function printAnalysis(description: string, projectDir: string, mode = 'copilot'): void {
   const result = analyzeMission(description, projectDir, mode);
-  console.log(JSON.stringify(result, null, 2));
+
+  // Piped (Claude calling) → JSON
+  if (!process.stdout.isTTY) {
+    console.log(JSON.stringify(result, null, 2));
+    return;
+  }
+
+  // Human in terminal → pretty output
+  const { header, kv, colors, table, info } = require('../ui/theme.js');
+  console.log('');
+  console.log(header('MISSION ANALYSIS'));
+  console.log('');
+  console.log(kv('Intent', result.intent));
+  console.log(kv('Scope', result.scope));
+  console.log(kv('Mode', result.mode));
+  console.log(kv('Est. tokens', `~${result.estimatedTokens.toLocaleString()}`));
+  console.log(kv('Budget usage', `${result.sessionAdvice.budgetPercent}% of ${result.sessionAdvice.plan.name} window`));
+  console.log('');
+
+  console.log(header('EXECUTION PLAN'));
+  console.log('');
+
+  const rows = result.plan.map((s: { droneName: string; parallelGroup: number; type: string }) => [
+    s.droneName,
+    s.type === 'ai' ? colors.secondary('AI') : colors.success('tool'),
+    String(s.parallelGroup),
+  ]);
+  console.log(table(['Drone', 'Type', 'Group'], rows, [14, 6, 5]));
+  console.log('');
+
+  console.log(info(result.sessionAdvice.recommendation));
+  console.log('');
 }

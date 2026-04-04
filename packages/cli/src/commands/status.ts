@@ -1,7 +1,7 @@
-import { type Mission } from '@swarm/core';
-import chalk from 'chalk';
+import { type Mission } from '@mctl/core';
 import { loadProjectContext } from '../context.js';
-import { formatStatus, formatTimestamp } from '../format.js';
+import { formatTimestamp } from '../format.js';
+import { LOGO_SMALL, header, kv, divider, statusBadge, colors } from '../ui/theme.js';
 
 export interface SwarmStatus {
   totalMissions: number;
@@ -30,37 +30,29 @@ export function getStatus(projectDir: string): SwarmStatus {
 
 export function printStatus(projectDir: string): void {
   const status = getStatus(projectDir);
-  const w = 52;
-  const inner = w - 2;
 
-  const ln = (s: string) => `│${pad(s, inner)}│`;
+  console.log('');
+  console.log(header('STATUS'));
+  console.log('');
 
-  const lines: string[] = [];
-  lines.push(`┌ SWARM STATUS ${'─'.repeat(inner - 15)}┐`);
+  console.log(kv('Missions', colors.bright(String(status.totalMissions))));
 
   if (status.latestMission) {
-    lines.push(ln(` Missions:   ${chalk.bold(String(status.totalMissions))} total`));
-    lines.push(ln(` Latest:     ${formatStatus(status.latestMission.status)}`));
-    lines.push(ln(`             "${status.latestMission.description}"`));
-    lines.push(ln(`             ${chalk.gray(formatTimestamp(status.latestMission.createdAt))}`));
+    console.log(kv('Latest', statusBadge(status.latestMission.status)));
+    console.log(kv('', `"${status.latestMission.description}"`));
+    console.log(kv('', colors.muted(formatTimestamp(status.latestMission.createdAt))));
   } else {
-    lines.push(ln(` Missions:   ${chalk.gray('none yet')}`));
+    console.log(kv('Latest', colors.muted('No missions yet')));
   }
 
-  lines.push(ln(''));
-  lines.push(ln(chalk.bold(' Memory')));
-  lines.push(ln(`   short-term  ${String(status.memoryStats.short)} entries`));
-  lines.push(ln(`   working     ${String(status.memoryStats.working)} entries`));
-  lines.push(ln(`   long-term   ${String(status.memoryStats.long)} entries`));
-  lines.push(ln(''));
-  lines.push(ln(` Drones:     ${chalk.bold(String(status.registeredDrones))} registered`));
+  console.log('');
+  console.log(header('MEMORY'));
+  console.log('');
+  console.log(kv('Short-term', String(status.memoryStats.short)));
+  console.log(kv('Working', String(status.memoryStats.working)));
+  console.log(kv('Long-term', String(status.memoryStats.long)));
 
-  lines.push(`└${'─'.repeat(inner)}┘`);
-  console.log(lines.join('\n'));
-}
-
-function pad(str: string, width: number): string {
-  const plain = str.replace(/\x1b\[\d*(;\d+)*m/g, '');
-  const padding = Math.max(0, width - plain.length);
-  return str + ' '.repeat(padding);
+  console.log('');
+  console.log(kv('Drones', `${colors.bright(String(status.registeredDrones))} registered`));
+  console.log('');
 }

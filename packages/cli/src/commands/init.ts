@@ -1,5 +1,6 @@
 import fs from 'fs';
 import path from 'path';
+import { DRONE_ASCII, colors, header, success, info, kv } from '../ui/theme.js';
 
 const DEFAULT_CONFIG = `# Mission Control Configuration
 # This file is meant to be committed to version control.
@@ -33,11 +34,11 @@ dashboard:
 const GITIGNORE_ENTRIES = ['.mctl/memory.db', '.mctl/checkpoints/'];
 
 export function initProject(projectDir: string): void {
-  const swarmDir = path.join(projectDir, '.mctl');
-  const checkpointsDir = path.join(swarmDir, 'checkpoints');
-  const configPath = path.join(swarmDir, 'config.yaml');
+  const mctlDir = path.join(projectDir, '.mctl');
+  const checkpointsDir = path.join(mctlDir, 'checkpoints');
+  const configPath = path.join(mctlDir, 'config.yaml');
 
-  fs.mkdirSync(swarmDir, { recursive: true });
+  fs.mkdirSync(mctlDir, { recursive: true });
   fs.mkdirSync(checkpointsDir, { recursive: true });
 
   if (!fs.existsSync(configPath)) {
@@ -60,4 +61,22 @@ export function initProject(projectDir: string): void {
     const addition = (gitignore === '' ? '' : suffix) + '\n# Mission Control\n' + newEntries.join('\n') + '\n';
     fs.writeFileSync(gitignorePath, gitignore + addition, 'utf-8');
   }
+}
+
+export function printInit(projectDir: string): void {
+  initProject(projectDir);
+
+  console.log(DRONE_ASCII);
+  console.log(header('INITIALIZED'));
+  console.log('');
+  console.log(success('Mission Control is ready.'));
+  console.log('');
+  console.log(kv('Config', '.mctl/config.yaml'));
+  console.log(kv('Memory', '.mctl/memory.db'));
+  console.log(kv('Drones', '8 built-in'));
+  console.log(kv('Plan', 'pro (change with: mission config set-plan)'));
+  console.log('');
+  console.log(info(`Run ${colors.bright('mission run "your task"')} to start a mission`));
+  console.log(info(`Run ${colors.bright('mission drone create <name>')} to build a custom drone`));
+  console.log('');
 }

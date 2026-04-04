@@ -1,8 +1,7 @@
-import { type MemoryEntry, type MemoryLayerName } from '@swarm/core';
-import chalk from 'chalk';
+import { type MemoryEntry, type MemoryLayerName } from '@mctl/core';
 import { loadProjectContext } from '../context.js';
 import { formatTimestamp } from '../format.js';
-import { padRight } from '../ui/layout.js';
+import { header, colors, table } from '../ui/theme.js';
 
 export interface MemoryListing {
   short: MemoryEntry[];
@@ -37,49 +36,33 @@ export function forgetMemory(projectDir: string, key: string, layer: MemoryLayer
 export function printMemory(projectDir: string, layer?: MemoryLayerName): void {
   const listing = listMemory(projectDir, layer);
   const total = listing.short.length + listing.working.length + listing.long.length;
-  const w = 64;
-  const inner = w - 2;
 
-  const ln = (s: string) => `│${pad(s, inner)}│`;
+  console.log('');
+  console.log(header('MEMORY'));
+  console.log('');
 
   if (total === 0) {
-    const lines = [
-      `┌ MEMORY ${'─'.repeat(inner - 8)}┐`,
-      ln(chalk.gray(' No memory entries. Memory is populated as missions run.')),
-      `└${'─'.repeat(inner)}┘`,
-    ];
-    console.log(lines.join('\n'));
+    console.log(`  ${colors.muted('No memory entries. Memory is populated as missions run.')}`);
+    console.log('');
     return;
   }
 
-  const lines: string[] = [];
-  lines.push(`┌ MEMORY ${'─'.repeat(inner - 8)}┐`);
+  const trunc = (s: string, n: number) => s.length > n ? s.slice(0, n - 1) + '…' : s;
 
   const layerData: [string, MemoryEntry[]][] = [
-    ['Short-term', listing.short],
-    ['Working', listing.working],
-    ['Long-term', listing.long],
+    ['SHORT-TERM', listing.short],
+    ['WORKING', listing.working],
+    ['LONG-TERM', listing.long],
   ];
 
-  let first = true;
   for (const [name, entries] of layerData) {
     if (entries.length === 0) continue;
-    if (!first) lines.push(`├${'─'.repeat(inner)}┤`);
-    first = false;
 
-    lines.push(ln(chalk.bold(` ${name} (${entries.length})`)));
-    for (const e of entries) {
-      const val = padRight(e.value, 28);
-      lines.push(ln(` ${padRight(e.key, 22)}  ${val}`));
-    }
+    console.log(`  ${colors.secondary(`▸ ${name}`)} ${colors.muted(`(${entries.length})`)}`);
+    console.log('');
+
+    const rows = entries.map((e) => [e.key, trunc(e.value, 30)]);
+    console.log(table(['Key', 'Value'], rows, [24, 30]));
+    console.log('');
   }
-
-  lines.push(`└${'─'.repeat(inner)}┘`);
-  console.log(lines.join('\n'));
-}
-
-function pad(str: string, width: number): string {
-  const plain = str.replace(/\x1b\[\d*(;\d+)*m/g, '');
-  const padding = Math.max(0, width - plain.length);
-  return str + ' '.repeat(padding);
 }

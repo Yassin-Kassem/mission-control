@@ -1,4 +1,4 @@
-import { createMissionId, MissionRunner, MissionLearner, type DroneExecutor, ScoutExecutor, TesterExecutor, SecurityExecutor } from '@swarm/core';
+import { createMissionId, MissionRunner, MissionLearner, type DroneExecutor, ScoutExecutor, TesterExecutor, SecurityExecutor } from '@mctl/core';
 import { DashboardServer } from '../dashboard/server.js';
 import { loadProjectContext } from '../context.js';
 import { TerminalUI } from '../ui/terminal-ui.js';
