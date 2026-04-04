@@ -24,7 +24,7 @@ export class TerminalUI {
   private write: (text: string) => void;
   private bus: SignalBus;
   private handler: ((signal: Signal) => void) | null = null;
-  private frameCount = 0;
+  private lastLineCount = 0;
 
   constructor(options: TerminalUIOptions) {
     this.bus = options.bus;
@@ -42,11 +42,6 @@ export class TerminalUI {
   }
 
   start(): void {
-    // Switch to alternate screen buffer (like vim/less)
-    this.write('\x1b[?1049h');
-    // Hide cursor
-    this.write('\x1b[?25l');
-
     this.handler = (signal: Signal) => {
       if (signal.missionId !== this.missionId) return;
       this.processSignal(signal);
@@ -61,14 +56,9 @@ export class TerminalUI {
       this.bus.off('*', this.handler);
       this.handler = null;
     }
-    // Show cursor
-    this.write('\x1b[?25h');
-    // Switch back to main screen buffer (restores terminal history)
-    this.write('\x1b[?1049l');
   }
 
   render(): void {
-    this.frameCount++;
     const lines: string[] = [];
     const w = this.width;
     const inner = w - 2;
@@ -127,11 +117,13 @@ export class TerminalUI {
 
     lines.push(`└${'─'.repeat(inner)}┘`);
 
-    const output = lines.join('\n') + '\n';
+    // If we've rendered before, move cursor up to overwrite previous frame
+    if (this.lastLineCount > 0) {
+      this.write(`\x1b[${this.lastLineCount}F`);
+    }
 
-    // Move cursor to top-left and clear screen, then draw
-    this.write('\x1b[H\x1b[2J');
-    this.write(output);
+    this.write(lines.join('\n') + '\n');
+    this.lastLineCount = lines.length;
   }
 
   private processSignal(signal: Signal): void {
@@ -186,6 +178,5 @@ export class TerminalUI {
 }
 
 function stripAnsi(str: string): string {
-  // Handles all ANSI escape sequences including chalk's
   return str.replace(/\x1b\[\d*(;\d+)*m/g, '');
 }
