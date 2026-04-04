@@ -30,18 +30,20 @@ program
   .command('run')
   .description('Start a new mission')
   .argument('<description>', 'What you want to accomplish')
-  .option('--no-dashboard', 'Run without the browser dashboard')
+  .option('--no-ui', 'Disable terminal mission control UI')
+  .option('--no-dashboard', 'Disable browser dashboard server')
   .option('--drones <names>', 'Comma-separated list of drones to activate')
   .option('--scope <scope>', 'Override scope detection (trivial|small|medium|large|epic)')
   .option('--no-analyze', 'Skip the context analyzer')
-  .option('--port <port>', 'Dashboard port', '3000')
+  .option('--port <port>', 'Dashboard port (enables browser dashboard)')
   .action(async (description: string, options) => {
     await runMission(description, process.cwd(), {
+      noUi: !options.ui,
       noDashboard: !options.dashboard,
       drones: options.drones,
       scope: options.scope,
       noAnalyze: !options.analyze,
-      port: parseInt(options.port, 10),
+      port: options.port ? parseInt(options.port, 10) : undefined,
     });
   });
 
