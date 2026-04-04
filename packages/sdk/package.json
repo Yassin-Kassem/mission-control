@@ -1,0 +1,21 @@
+{
+  "name": "@mctl/sdk",
+  "version": "0.0.1",
+  "description": "Mission Control Drone SDK — build custom drones",
+  "type": "module",
+  "main": "dist/index.js",
+  "types": "dist/index.d.ts",
+  "scripts": {
+    "build": "tsc",
+    "test": "vitest run",
+    "lint": "eslint src/"
+  },
+  "dependencies": {
+    "@mctl/core": "workspace:*",
+    "yaml": "^2.0.0"
+  },
+  "devDependencies": {
+    "vitest": "^3.0.0",
+    "typescript": "^5.7.0"
+  }
+}
