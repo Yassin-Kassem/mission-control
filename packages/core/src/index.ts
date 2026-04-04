@@ -33,6 +33,7 @@ export { MissionRunner, type MissionRunnerConfig, type MissionResult } from './m
 // Executors
 export { ScoutExecutor } from './drones/executors/scout-executor.js';
 export { TesterExecutor } from './drones/executors/tester-executor.js';
+export { SecurityExecutor } from './drones/executors/security-executor.js';
 
 // Recovery
 export { type Checkpoint, type CheckpointData } from './recovery/checkpoint.js';
