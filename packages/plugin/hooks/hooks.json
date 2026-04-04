@@ -1,0 +1,14 @@
+{
+  "hooks": {
+    "SessionStart": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "echo '[swarm] Plugin loaded. Use /swarm:run to start a mission.'"
+          }
+        ]
+      }
+    ]
+  }
+}
