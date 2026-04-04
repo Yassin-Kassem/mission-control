@@ -35,19 +35,28 @@ ${colors.secondary('     ╚═════╝  ╚═════╝  ╚═╝
 
 ${colors.dim('                          ─── ◈ ───')}
 
-${colors.warning('                 ##')}${colors.muted('*')}${colors.warning('##')}                     ${colors.warning('##')}${colors.muted('*')}${colors.warning('##')}
-${colors.warning('               ##')}${colors.muted('***')}${colors.warning('##')}                   ${colors.warning('##')}${colors.muted('***')}${colors.warning('##')}
-${colors.warning('                ##')}${colors.muted('*')}${colors.warning('##')}                     ${colors.warning('##')}${colors.muted('*')}${colors.warning('##')}
-${colors.dim('                  ╲')}                         ${colors.dim('╱')}
-${colors.dim('                   ╲')}${colors.muted('───────╮     ╭───────')}${colors.dim('╱')}
-${colors.dim('                    ')}${colors.muted('       │')} ${colors.success('■')}${colors.bright(' ● ')}${colors.success('■')} ${colors.muted('│')}
-${colors.dim('                    ')}${colors.muted('  ╭────┤')}${colors.dim('  ▼  ')}${colors.muted('├────╮')}
-${colors.dim('                    ')}${colors.muted('  │    ╰─────╯    │')}
-${colors.dim('                   ╱')}${colors.muted('───────╯         ╰───────')}${colors.dim('╲')}
-${colors.dim('                  ╱')}                         ${colors.dim('╲')}
-${colors.warning('                ##')}${colors.muted('*')}${colors.warning('##')}                     ${colors.warning('##')}${colors.muted('*')}${colors.warning('##')}
-${colors.warning('               ##')}${colors.muted('***')}${colors.warning('##')}                   ${colors.warning('##')}${colors.muted('***')}${colors.warning('##')}
-${colors.warning('                ##')}${colors.muted('*')}${colors.warning('##')}                     ${colors.warning('##')}${colors.muted('*')}${colors.warning('##')}
+${colors.primary('                          ****+=      +####')}
+${colors.primary('                      ##***#             ######')}
+${colors.primary('                   ##**#                     ######')}
+${colors.primary('              ***#%@                             %%%%##')}
+${colors.primary('          #**##@%%%#                             ##%@@%#####')}
+${colors.primary('      ******## ###++                             ==*%%  #######')}
+${colors.primary('   ******##      **+====     =#==---==#=     ====*#%      #######%%')}
+${colors.primary(' +*###              **++===-=%+--=====*%===++*#%%              ###*+')}
+${colors.primary('                        **##+==---====++#%%%%')}
+${colors.primary('                          =====----====--=*')}
+${colors.secondary(' +**                          =-===-----==---=+*                        %#+')}
+${colors.secondary('  #****                      +#*===*#****===+*%#                     %#%#%%')}
+${colors.secondary('   #*****                     #%#%%@@@@@@@%%*%%%                    ####%')}
+${colors.secondary('    %#****                ===+++#%%%%%%%%@%%%###*++                ####%')}
+${colors.secondary('      %#*#            ===+**#++#%@@##%%%%%@@%%#%%#*+===            ##%')}
+${colors.secondary('        %#**+    ====**##%%  *###@%#%%#%@%@@%%%%  ##*+++====    *##%%')}
+${colors.secondary('        +#%%#*++**#%%         %%%@@%%%%%#%@@%%         ##*+++=+*#%@@#')}
+${colors.muted('        +*%@%###                # %%%%%%%%% #%              ###%%@@%*')}
+${colors.muted('       =+*##%%###*                  %%%%@                   #%%%%%#**#')}
+${colors.muted('        +#% %%%%##*                                        #%%%%%  ##')}
+${colors.muted('        =*#   %%%####                                     #%%%%%  *##')}
+${colors.muted('                 %%#+                                    *%%%')}
 `;
 
 // ── LAYOUT COMPONENTS ────────────────────────────────────
