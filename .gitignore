@@ -1,0 +1,9 @@
+node_modules/
+dist/
+*.tsbuildinfo
+.swarm/memory.db
+.swarm/checkpoints/
+.env
+.env.local
+coverage/
+.turbo/

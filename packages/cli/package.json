@@ -1,0 +1,25 @@
+{
+  "name": "@swarm/cli",
+  "version": "0.0.1",
+  "description": "Swarm framework CLI",
+  "type": "module",
+  "bin": {
+    "swarm": "dist/index.js"
+  },
+  "scripts": {
+    "build": "tsc",
+    "test": "vitest run",
+    "test:watch": "vitest",
+    "lint": "eslint src/"
+  },
+  "dependencies": {
+    "@swarm/core": "workspace:*",
+    "commander": "^13.0.0",
+    "ws": "^8.0.0"
+  },
+  "devDependencies": {
+    "@types/ws": "^8.0.0",
+    "vitest": "^3.0.0",
+    "typescript": "^5.7.0"
+  }
+}

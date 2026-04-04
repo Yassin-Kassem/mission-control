@@ -1,0 +1,22 @@
+{
+  "name": "@swarm/core",
+  "version": "0.0.1",
+  "description": "Swarm framework core engine",
+  "type": "module",
+  "main": "dist/index.js",
+  "types": "dist/index.d.ts",
+  "scripts": {
+    "build": "tsc",
+    "test": "vitest run",
+    "test:watch": "vitest",
+    "lint": "eslint src/"
+  },
+  "dependencies": {
+    "better-sqlite3": "^11.0.0"
+  },
+  "devDependencies": {
+    "@types/better-sqlite3": "^7.0.0",
+    "vitest": "^3.0.0",
+    "typescript": "^5.7.0"
+  }
+}
