@@ -47,13 +47,32 @@ function detectFrameworks(dir: string): string[] {
 }
 
 function detectTestRunner(dir: string): { hasTests: boolean; runner: string | null } {
-  const pkg = readPackageJson(dir);
-  if (pkg) {
-    const allDeps = { ...pkg.dependencies, ...pkg.devDependencies };
-    if (allDeps.vitest) return { hasTests: true, runner: 'vitest' };
-    if (allDeps.jest) return { hasTests: true, runner: 'jest' };
-    if (allDeps.mocha) return { hasTests: true, runner: 'mocha' };
+  // Check root and workspace package.json files
+  const pkgPaths = [dir];
+  const packagesDir = path.join(dir, 'packages');
+  if (fs.existsSync(packagesDir)) {
+    try {
+      const entries = fs.readdirSync(packagesDir, { withFileTypes: true });
+      for (const entry of entries) {
+        if (entry.isDirectory()) pkgPaths.push(path.join(packagesDir, entry.name));
+      }
+    } catch { /* skip */ }
   }
+
+  for (const pkgDir of pkgPaths) {
+    const pkg = readPackageJson(pkgDir);
+    if (pkg) {
+      const allDeps = { ...pkg.dependencies, ...pkg.devDependencies };
+      if (allDeps.vitest) return { hasTests: true, runner: 'vitest' };
+      if (allDeps.jest) return { hasTests: true, runner: 'jest' };
+      if (allDeps.mocha) return { hasTests: true, runner: 'mocha' };
+    }
+  }
+
+  // Check for vitest/jest config files directly
+  if (fileExists(dir, 'vitest.config.ts') || fileExists(dir, 'vitest.config.js')) return { hasTests: true, runner: 'vitest' };
+  if (fileExists(dir, 'jest.config.ts') || fileExists(dir, 'jest.config.js')) return { hasTests: true, runner: 'jest' };
+
   const reqTxt = readFile(dir, 'requirements.txt');
   if (reqTxt && /pytest/i.test(reqTxt)) return { hasTests: true, runner: 'pytest' };
   if (fileExists(dir, 'pytest.ini') || fileExists(dir, 'setup.cfg')) return { hasTests: true, runner: 'pytest' };
