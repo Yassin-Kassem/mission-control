@@ -37,6 +37,7 @@ export { SecurityExecutor } from './drones/executors/security-executor.js';
 
 // Token Tracker
 export { TokenTracker, type TokenEstimate, type TokenUsage, type DroneTokenEstimate } from './mission/token-tracker.js';
+export { MissionRollback } from './mission/rollback.js';
 
 // Recovery
 export { type Checkpoint, type CheckpointData } from './recovery/checkpoint.js';
