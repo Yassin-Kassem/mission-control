@@ -23,12 +23,12 @@ export function renderDronePanel(drones: DroneDisplayState[], width: number): st
   });
 }
 
-export function renderDronePanelColored(drones: DroneDisplayState[], width: number): string[] {
+export function renderDronePanelColored(drones: DroneDisplayState[], width: number): { plain: string; colored: string }[] {
   return drones.map((d) => {
     const display = STATE_DISPLAY[d.state] ?? STATE_DISPLAY.idle;
-    const icon = display.color(display.icon);
-    const label = display.color(display.label);
     const nameStr = padRight(d.name, 12);
-    return `${icon} ${nameStr} ${label}`;
+    const plain = `${display.icon} ${nameStr} ${display.label}`;
+    const colored = `${display.color(display.icon)} ${nameStr} ${display.color(display.label)}`;
+    return { plain, colored };
   });
 }

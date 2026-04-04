@@ -77,7 +77,11 @@ export class TerminalUI {
     const pct = this.totalDrones > 0
       ? Math.round((this.completedCount / this.totalDrones) * 100)
       : 0;
-    lines.push(this.pad(` Progress: ${this.progressBar(pct, 20)} ${pct}%  ${elapsed}`));
+    const barPlain = '█'.repeat(Math.round((pct / 100) * 20)) + '░'.repeat(20 - Math.round((pct / 100) * 20));
+    const barColored = this.progressBar(pct, 20);
+    const progressPlain = ` Progress: ${barPlain} ${pct}%  ${elapsed}`;
+    const progressColored = ` Progress: ${barColored} ${pct}%  ${elapsed}`;
+    lines.push(this.padColored(progressColored, progressPlain.length));
 
     lines.push(`├${'─'.repeat(inner)}┤`);
 
@@ -88,10 +92,9 @@ export class TerminalUI {
       drones.push({ name, state });
     }
     const droneLines = renderDronePanelColored(drones, inner - 2);
-    for (const line of droneLines) {
-      const plainLen = stripAnsi(line).length;
-      const padding = Math.max(0, inner - plainLen - 1);
-      lines.push(`│ ${line}${' '.repeat(padding)}│`);
+    for (const { plain, colored } of droneLines) {
+      const padding = Math.max(0, inner - plain.length - 1);
+      lines.push(`│ ${colored}${' '.repeat(padding)}│`);
     }
 
     lines.push(`├${'─'.repeat(inner)}┤`);
@@ -104,11 +107,12 @@ export class TerminalUI {
       lines.push(this.pad(chalk.gray('  Waiting for signals...')));
     } else {
       for (const sig of recentSignals) {
-        const prefix = sig.severity === 'critical' ? chalk.red('!') : sig.severity === 'warning' ? chalk.yellow('~') : ' ';
-        const text = `${prefix} ${sig.time} ${chalk.gray(`[${sig.source}]`)} ${sig.topic}`;
-        const plainLen = stripAnsi(text).length;
-        const padding = Math.max(0, inner - plainLen - 1);
-        lines.push(`│ ${text}${' '.repeat(padding)}│`);
+        const prefixChar = sig.severity === 'critical' ? '!' : sig.severity === 'warning' ? '~' : ' ';
+        const prefixColored = sig.severity === 'critical' ? chalk.red('!') : sig.severity === 'warning' ? chalk.yellow('~') : ' ';
+        const plainText = `${prefixChar} ${sig.time} [${sig.source}] ${sig.topic}`;
+        const coloredText = `${prefixColored} ${sig.time} ${chalk.gray(`[${sig.source}]`)} ${sig.topic}`;
+        const padding = Math.max(0, inner - plainText.length - 1);
+        lines.push(`│ ${coloredText}${' '.repeat(padding)}│`);
       }
     }
 
@@ -165,8 +169,15 @@ export class TerminalUI {
     const padding = Math.max(0, inner - plainLen);
     return `│${content}${' '.repeat(padding)}│`;
   }
+
+  private padColored(colored: string, plainLen: number): string {
+    const inner = this.width - 2;
+    const padding = Math.max(0, inner - plainLen);
+    return `│${colored}${' '.repeat(padding)}│`;
+  }
 }
 
 function stripAnsi(str: string): string {
-  return str.replace(/\x1b\[[0-9;]*m/g, '');
+  // Handles all ANSI escape sequences including chalk's
+  return str.replace(/\x1b\[\d*(;\d+)*m/g, '');
 }
