@@ -39,6 +39,7 @@ export { SecurityExecutor } from './drones/executors/security-executor.js';
 export { TokenTracker, type TokenEstimate, type TokenUsage, type DroneTokenEstimate } from './mission/token-tracker.js';
 export { MissionRollback } from './mission/rollback.js';
 export { MissionLearner } from './memory/mission-learner.js';
+export { SessionAdvisor, getPlanLimits, type ClaudePlan, type PlanLimits, type SessionAdvice, type SessionStep } from './mission/session-advisor.js';
 
 // Recovery
 export { type Checkpoint, type CheckpointData } from './recovery/checkpoint.js';

@@ -1,6 +1,6 @@
 #!/usr/bin/env node
 import { Command } from 'commander';
-import { type MemoryLayerName } from '@swarm/core';
+import { type MemoryLayerName } from '@mctl/core';
 import { initProject } from './commands/init.js';
 import { runMission } from './commands/run.js';
 import { printStatus } from './commands/status.js';
@@ -17,17 +17,17 @@ import { rollbackMission as doRollback, printSnapshots } from './commands/rollba
 const program = new Command();
 
 program
-  .name('swarm')
-  .description('Adaptive Claude Code orchestration framework')
+  .name('mission')
+  .description('Mission Control — adaptive AI orchestration framework')
   .version('0.0.1');
 
 program
   .command('init')
-  .description('Initialize swarm in the current project')
+  .description('Initialize Mission Control in the current project')
   .argument('[dir]', 'Project directory', process.cwd())
   .action((dir: string) => {
     initProject(dir);
-    console.log('Swarm initialized in', dir);
+    console.log('Mission Control initialized in', dir);
   });
 
 program
@@ -53,7 +53,7 @@ program
 
 program
   .command('status')
-  .description('Show current swarm status')
+  .description('Show current mission status')
   .argument('[dir]', 'Project directory', process.cwd())
   .action((dir: string) => {
     printStatus(dir);
@@ -113,7 +113,7 @@ droneCmd
 
 const memoryCmd = program
   .command('memory')
-  .description('Manage swarm memory');
+  .description('Manage mission memory');
 
 memoryCmd
   .command('show')
@@ -149,7 +149,7 @@ memoryCmd
 
 const configCmd = program
   .command('config')
-  .description('Manage swarm configuration');
+  .description('Manage mission configuration');
 
 configCmd
   .command('show')
@@ -157,6 +157,30 @@ configCmd
   .argument('[dir]', 'Project directory', process.cwd())
   .action((dir: string) => {
     printConfig(dir);
+  });
+
+configCmd
+  .command('set-plan')
+  .description('Set your Claude plan (affects token budgets and model selection)')
+  .argument('<plan>', 'Plan: pro | max5x | max20x | api')
+  .argument('[dir]', 'Project directory', process.cwd())
+  .action((plan: string, dir: string) => {
+    const valid = ['pro', 'max5x', 'max20x', 'api'];
+    if (!valid.includes(plan)) {
+      console.error(`Invalid plan "${plan}". Options: ${valid.join(', ')}`);
+      process.exit(1);
+    }
+    const fs = require('fs');
+    const path = require('path');
+    const configPath = path.join(dir, '.mctl', 'config.yaml');
+    if (!fs.existsSync(configPath)) {
+      console.error('Project not initialized. Run `mission init` first.');
+      process.exit(1);
+    }
+    let config = fs.readFileSync(configPath, 'utf-8');
+    config = config.replace(/^plan:\s*.+$/m, `plan: ${plan}`);
+    fs.writeFileSync(configPath, config, 'utf-8');
+    console.log(`Plan set to: ${plan}`);
   });
 
 program
