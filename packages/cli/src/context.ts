@@ -1,8 +1,8 @@
 import {
   createDatabase, type SwarmDatabase, SignalBus, SignalStore, MemoryManager,
   MissionStore, MissionPlanner, CheckpointManager, ContextAnalyzer,
-  DroneRegistry, type DroneManifest,
-} from '@swarm/core';
+  DroneRegistry, type DroneManifest, parseDroneManifest,
+} from '@mctl/core';
 import path from 'path';
 import fs from 'fs';
 
@@ -21,9 +21,9 @@ export interface ProjectContext {
 }
 
 export function loadProjectContext(projectDir: string): ProjectContext {
-  const swarmDir = path.join(projectDir, '.swarm');
+  const swarmDir = path.join(projectDir, '.mctl');
   if (!fs.existsSync(swarmDir)) {
-    throw new Error(`Project not initialized. Run \`swarm init\` first.`);
+    throw new Error(`Project not initialized. Run \`mission init\` first.`);
   }
 
   const dbPath = path.join(swarmDir, 'memory.db');
@@ -40,6 +40,12 @@ export function loadProjectContext(projectDir: string): ProjectContext {
     registry.register(drone);
   }
 
+  for (const drone of loadCommunityDrones(projectDir)) {
+    if (!registry.get(drone.name)) {
+      registry.register(drone);
+    }
+  }
+
   const analyzer = new ContextAnalyzer(registry, memory);
 
   return {
@@ -48,6 +54,30 @@ export function loadProjectContext(projectDir: string): ProjectContext {
     registry, planner, analyzer,
     close() { db.close(); },
   };
+}
+
+function loadCommunityDrones(projectDir: string): DroneManifest[] {
+  const dronesDir = path.join(projectDir, '.mctl', 'drones');
+  if (!fs.existsSync(dronesDir)) return [];
+
+  const drones: DroneManifest[] = [];
+  const entries = fs.readdirSync(dronesDir, { withFileTypes: true });
+
+  for (const entry of entries) {
+    if (!entry.isDirectory()) continue;
+    const manifestPath = path.join(dronesDir, entry.name, 'drone.yaml');
+    if (!fs.existsSync(manifestPath)) continue;
+
+    try {
+      const content = fs.readFileSync(manifestPath, 'utf-8');
+      const manifest = parseDroneManifest(content);
+      if (manifest.name) drones.push(manifest);
+    } catch {
+      // Skip invalid drones
+    }
+  }
+
+  return drones;
 }
 
 function getBuiltinDrones(): DroneManifest[] {
