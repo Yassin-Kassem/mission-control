@@ -5,7 +5,7 @@ import path from 'path';
 import os from 'os';
 
 describe('SwarmDatabase', () => {
-  const testDbPath = path.join(os.tmpdir(), `swarm-test-${Date.now()}.db`);
+  const testDbPath = path.join(os.tmpdir(), `mctl-test-${Date.now()}.db`);
   let db: SwarmDatabase;
 
   afterEach(() => {

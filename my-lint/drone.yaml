@@ -1,0 +1,19 @@
+name: my-lint
+description: A custom drone for Mission Control
+
+triggers:
+  keywords:
+    - my-lint
+
+opinions:
+  requires: []
+  suggests: []
+  blocks: []
+
+signals:
+  emits:
+    - my-lint.done
+  listens: []
+
+priority: 50
+escalation: user

@@ -54,5 +54,5 @@ export class ScoutExecutor {
 
 const IGNORED = new Set([
   'node_modules', '.git', 'dist', 'build', 'coverage',
-  '.swarm', '.next', '.turbo', '__pycache__', '.venv',
+  '.mctl', '.next', '.turbo', '__pycache__', '.venv',
 ]);

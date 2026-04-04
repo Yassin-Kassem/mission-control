@@ -1,4 +1,4 @@
-import type { SignalBus, Signal } from '@swarm/core';
+import type { SignalBus, Signal } from '@mctl/core';
 
 type BroadcastListener = (signal: Signal) => void;
 

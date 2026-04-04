@@ -1,7 +1,7 @@
 import { type Mission, type Signal } from '@mctl/core';
 import { loadProjectContext } from '../context.js';
 import { formatTimestamp } from '../format.js';
-import { header, kv, colors, statusBadge, error as themeError } from '../ui/theme.js';
+import { banner, sectionStart, sectionEnd, kv, separator, statusBadge, colors, error as themeError } from '../ui/theme.js';
 
 export interface ReplayData {
   mission: Mission | undefined;
@@ -19,21 +19,26 @@ export function getReplay(projectDir: string, missionId: string): ReplayData {
 export function printReplay(projectDir: string, missionId: string): void {
   const { mission, signals } = getReplay(projectDir, missionId);
 
+  console.log('');
+
   if (!mission) {
-    console.log('');
-    console.log(themeError(`Mission "${missionId}" not found.`));
+    console.log(themeError(`Mission "${missionId}" not found in logs.`));
     console.log('');
     return;
   }
 
+  console.log(banner('S I G N A L   R E P L A Y'));
   console.log('');
-  console.log(header('REPLAY'));
-  console.log('');
-  console.log(kv('Mission', mission.description));
+
+  console.log(sectionStart('MISSION BRIEF'));
+  console.log(kv('Target', colors.text(mission.description)));
   console.log(kv('Status', statusBadge(mission.status)));
-  console.log(kv('Created', formatTimestamp(mission.createdAt)));
-  console.log(kv('Signals', String(signals.length)));
+  console.log(kv('Deployed', colors.muted(formatTimestamp(mission.createdAt))));
+  console.log(kv('Signals', colors.bright(String(signals.length)) + colors.muted(' intercepted')));
+  console.log(sectionEnd());
+
   console.log('');
+  console.log(sectionStart('SIGNAL FEED'));
 
   for (const signal of signals) {
     const time = new Date(signal.timestamp).toLocaleTimeString('en-US', {
@@ -42,9 +47,11 @@ export function printReplay(projectDir: string, missionId: string): void {
 
     const prefix = signal.severity === 'critical' ? colors.danger('!')
       : signal.severity === 'warning' ? colors.warning('~')
-      : colors.muted('·');
+      : colors.dim('·');
 
-    console.log(`  ${prefix} ${colors.muted(time)} ${colors.secondary(`[${signal.source}]`)} ${colors.text(signal.topic)}`);
+    console.log(`  ${colors.secondary('│')} ${prefix} ${colors.muted(time)} ${colors.secondary(signal.source.padEnd(14))} ${colors.text(signal.topic)}`);
   }
+
+  console.log(sectionEnd());
   console.log('');
 }

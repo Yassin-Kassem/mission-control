@@ -9,7 +9,7 @@ import os from 'os';
 describe('listMemory', () => {
   let tmpDir: string;
   beforeEach(() => {
-    tmpDir = fs.mkdtempSync(path.join(os.tmpdir(), 'swarm-mem-'));
+    tmpDir = fs.mkdtempSync(path.join(os.tmpdir(), 'mctl-mem-'));
     fs.writeFileSync(path.join(tmpDir, 'package.json'), '{}');
     initProject(tmpDir);
   });
@@ -40,7 +40,7 @@ describe('listMemory', () => {
 describe('promoteMemory', () => {
   let tmpDir: string;
   beforeEach(() => {
-    tmpDir = fs.mkdtempSync(path.join(os.tmpdir(), 'swarm-mem-promote-'));
+    tmpDir = fs.mkdtempSync(path.join(os.tmpdir(), 'mctl-mem-promote-'));
     fs.writeFileSync(path.join(tmpDir, 'package.json'), '{}');
     initProject(tmpDir);
   });
@@ -61,7 +61,7 @@ describe('promoteMemory', () => {
 describe('forgetMemory', () => {
   let tmpDir: string;
   beforeEach(() => {
-    tmpDir = fs.mkdtempSync(path.join(os.tmpdir(), 'swarm-mem-forget-'));
+    tmpDir = fs.mkdtempSync(path.join(os.tmpdir(), 'mctl-mem-forget-'));
     fs.writeFileSync(path.join(tmpDir, 'package.json'), '{}');
     initProject(tmpDir);
   });

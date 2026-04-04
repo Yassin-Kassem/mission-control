@@ -1,0 +1,18 @@
+{
+  "permissions": {
+    "allow": [
+      "WebSearch",
+      "Bash(npx mission:*)",
+      "Bash(ls node_modules/.bin/mission*)",
+      "Bash(node:*)",
+      "Bash(bash:*)",
+      "Bash(echo \"exit: $?\")",
+      "Bash(npx vitest:*)",
+      "Read(//c/Users/Yassin/node_modules/.bin/**)",
+      "Read(//c/Users/Yassin/node_modules/**)",
+      "Bash(pnpm --filter core exec vitest run --root ../..)",
+      "Bash(pnpm add:*)",
+      "Bash(pnpm exec:*)"
+    ]
+  }
+}

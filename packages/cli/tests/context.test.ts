@@ -9,7 +9,7 @@ describe('loadProjectContext', () => {
   let tmpDir: string;
 
   beforeEach(() => {
-    tmpDir = fs.mkdtempSync(path.join(os.tmpdir(), 'swarm-ctx-'));
+    tmpDir = fs.mkdtempSync(path.join(os.tmpdir(), 'mctl-ctx-'));
     fs.writeFileSync(path.join(tmpDir, 'package.json'), '{}');
     initProject(tmpDir);
   });
@@ -30,7 +30,7 @@ describe('loadProjectContext', () => {
   });
 
   it('throws if project not initialized', () => {
-    const emptyDir = fs.mkdtempSync(path.join(os.tmpdir(), 'swarm-empty-'));
+    const emptyDir = fs.mkdtempSync(path.join(os.tmpdir(), 'mctl-empty-'));
     expect(() => loadProjectContext(emptyDir)).toThrow('not initialized');
     fs.rmSync(emptyDir, { recursive: true, force: true });
   });

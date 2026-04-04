@@ -1,7 +1,7 @@
 import { type Mission } from '@mctl/core';
 import { loadProjectContext } from '../context.js';
 import { formatTimestamp } from '../format.js';
-import { header, colors, table } from '../ui/theme.js';
+import { banner, colors, table, trunc } from '../ui/theme.js';
 
 export function getHistory(projectDir: string, limit = 20): Mission[] {
   const ctx = loadProjectContext(projectDir);
@@ -14,33 +14,29 @@ export function printHistory(projectDir: string, limit = 20): void {
   const missions = getHistory(projectDir, limit);
 
   console.log('');
-  console.log(header(`MISSION HISTORY (${missions.length})`));
+  console.log(banner('M I S S I O N   L O G'));
   console.log('');
 
   if (missions.length === 0) {
-    console.log(`  ${colors.muted('No missions yet. Run')} ${colors.bright('mission run "task"')} ${colors.muted('to start one.')}`);
+    console.log(`  ${colors.muted('No missions in the log. Deploy with')} ${colors.bright('mission run "task"')}`);
     console.log('');
     return;
   }
 
-  const trunc = (s: string, n: number) => s.length > n ? s.slice(0, n - 1) + '…' : s;
-
   const rows = missions.map((m) => {
-    const icon = m.status === 'completed' ? colors.success('●')
-      : m.status === 'failed' ? colors.danger('●')
+    const icon = m.status === 'completed' ? colors.success('■')
+      : m.status === 'failed' ? colors.danger('■')
       : colors.muted('○');
     return [
-      m.id.slice(0, 16),
-      `${icon} ${m.status}`,
-      trunc(m.description, 28),
+      colors.muted(m.id.slice(2, 16)),
+      `${icon} ${m.status === 'completed' ? colors.success(m.status) : m.status === 'failed' ? colors.danger(m.status) : colors.text(m.status)}`,
+      colors.text(trunc(m.description, 26)),
       colors.muted(formatTimestamp(m.createdAt)),
     ];
   });
 
-  console.log(table(
-    ['ID', 'Status', 'Description', 'Date'],
-    rows,
-    [16, 14, 28, 19],
-  ));
+  console.log(table(['ID', 'STATUS', 'MISSION', 'TIMESTAMP'], rows, [14, 14, 26, 19]));
+  console.log('');
+  console.log(`  ${colors.muted(`${missions.length} operations logged`)}`);
   console.log('');
 }

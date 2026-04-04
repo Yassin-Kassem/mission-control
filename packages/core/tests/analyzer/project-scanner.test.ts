@@ -7,7 +7,7 @@ import os from 'os';
 describe('scanProject', () => {
   let tmpDir: string;
 
-  beforeEach(() => { tmpDir = fs.mkdtempSync(path.join(os.tmpdir(), 'swarm-scan-')); });
+  beforeEach(() => { tmpDir = fs.mkdtempSync(path.join(os.tmpdir(), 'mctl-scan-')); });
   afterEach(() => { fs.rmSync(tmpDir, { recursive: true, force: true }); });
 
   it('detects TypeScript project with package.json', () => {

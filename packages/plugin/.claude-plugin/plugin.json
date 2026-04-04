@@ -1,7 +1,7 @@
 {
-  "name": "swarm",
+  "name": "mission-control",
   "version": "0.0.1",
-  "description": "Adaptive AI orchestration framework — self-organizing drone swarm for Claude Code",
+  "description": "Mission Control — adaptive AI orchestration framework for Claude Code",
   "author": {
     "name": "Yassin"
   },
@@ -9,7 +9,7 @@
   "keywords": [
     "orchestration",
     "drones",
-    "swarm",
+    "mission",
     "adaptive",
     "mission-control"
   ],

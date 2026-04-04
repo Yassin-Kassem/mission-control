@@ -5,7 +5,7 @@
         "hooks": [
           {
             "type": "command",
-            "command": "echo '[swarm] Plugin loaded. Use /swarm:run to start a mission.'"
+            "command": "echo '[mission-control] Plugin loaded. Use /mission-control:run to start a mission.'"
           }
         ]
       }

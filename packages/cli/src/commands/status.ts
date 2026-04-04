@@ -1,7 +1,7 @@
 import { type Mission } from '@mctl/core';
 import { loadProjectContext } from '../context.js';
 import { formatTimestamp } from '../format.js';
-import { LOGO_SMALL, header, kv, divider, statusBadge, colors } from '../ui/theme.js';
+import { banner, sectionStart, sectionEnd, kv, separator, statusBadge, colors, readout } from '../ui/theme.js';
 
 export interface SwarmStatus {
   totalMissions: number;
@@ -29,30 +29,35 @@ export function getStatus(projectDir: string): SwarmStatus {
 }
 
 export function printStatus(projectDir: string): void {
-  const status = getStatus(projectDir);
+  const s = getStatus(projectDir);
 
   console.log('');
-  console.log(header('STATUS'));
+  console.log(banner('T A C T I C A L   O V E R V I E W'));
   console.log('');
 
-  console.log(kv('Missions', colors.bright(String(status.totalMissions))));
-
-  if (status.latestMission) {
-    console.log(kv('Latest', statusBadge(status.latestMission.status)));
-    console.log(kv('', `"${status.latestMission.description}"`));
-    console.log(kv('', colors.muted(formatTimestamp(status.latestMission.createdAt))));
+  console.log(sectionStart('OPERATIONS'));
+  console.log(kv('Missions', colors.bright(String(s.totalMissions)) + colors.muted(' total')));
+  if (s.latestMission) {
+    console.log(kv('Last mission', statusBadge(s.latestMission.status)));
+    console.log(kv('', colors.text(`"${s.latestMission.description}"`)));
+    console.log(kv('', colors.muted(formatTimestamp(s.latestMission.createdAt))));
   } else {
-    console.log(kv('Latest', colors.muted('No missions yet')));
+    console.log(kv('Last mission', colors.muted('No missions deployed')));
   }
+  console.log(sectionEnd());
 
   console.log('');
-  console.log(header('MEMORY'));
-  console.log('');
-  console.log(kv('Short-term', String(status.memoryStats.short)));
-  console.log(kv('Working', String(status.memoryStats.working)));
-  console.log(kv('Long-term', String(status.memoryStats.long)));
+
+  console.log(sectionStart('INTEL'));
+  console.log(kv('Short-term', colors.text(String(s.memoryStats.short)) + colors.muted(' entries')));
+  console.log(kv('Working', colors.text(String(s.memoryStats.working)) + colors.muted(' entries')));
+  console.log(kv('Long-term', colors.text(String(s.memoryStats.long)) + colors.muted(' entries')));
+  console.log(sectionEnd());
 
   console.log('');
-  console.log(kv('Drones', `${colors.bright(String(status.registeredDrones))} registered`));
+
+  console.log(sectionStart('FLEET'));
+  console.log(kv('Drones', colors.bright(String(s.registeredDrones)) + colors.muted(' operational')));
+  console.log(sectionEnd());
   console.log('');
 }

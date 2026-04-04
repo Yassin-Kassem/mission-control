@@ -1,6 +1,6 @@
 {
-  "name": "@swarm/claude-code-plugin",
+  "name": "@mctl/claude-code-plugin",
   "version": "0.0.1",
-  "description": "Swarm framework Claude Code plugin",
+  "description": "Mission Control Claude Code plugin",
   "private": true
 }

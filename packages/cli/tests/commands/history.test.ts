@@ -9,7 +9,7 @@ import os from 'os';
 describe('getHistory', () => {
   let tmpDir: string;
   beforeEach(() => {
-    tmpDir = fs.mkdtempSync(path.join(os.tmpdir(), 'swarm-hist-'));
+    tmpDir = fs.mkdtempSync(path.join(os.tmpdir(), 'mctl-hist-'));
     fs.writeFileSync(path.join(tmpDir, 'package.json'), '{}');
     initProject(tmpDir);
   });

@@ -1,8 +1,8 @@
 {
-  "name": "swarm-framework",
+  "name": "mission-control",
   "version": "0.0.1",
   "private": true,
-  "description": "Adaptive Claude Code orchestration framework",
+  "description": "Mission Control — adaptive AI orchestration framework",
   "scripts": {
     "build": "turbo build",
     "test": "turbo test",

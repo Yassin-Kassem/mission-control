@@ -6,7 +6,7 @@ import os from 'os';
 
 describe('SecurityExecutor', () => {
   let tmpDir: string;
-  beforeEach(() => { tmpDir = fs.mkdtempSync(path.join(os.tmpdir(), 'swarm-sec-')); });
+  beforeEach(() => { tmpDir = fs.mkdtempSync(path.join(os.tmpdir(), 'mctl-sec-')); });
   afterEach(() => { fs.rmSync(tmpDir, { recursive: true, force: true }); });
 
   it('detects audit command for Node projects', () => {

@@ -50,10 +50,10 @@ describe('drone marketplace', () => {
 
   it('throws when adding duplicate drone', () => {
     addDrone(path.join(droneDir, 'my-lint'), tmpDir);
-    expect(() => addDrone(path.join(droneDir, 'my-lint'), tmpDir)).toThrow('already installed');
+    expect(() => addDrone(path.join(droneDir, 'my-lint'), tmpDir)).toThrow('already in fleet');
   });
 
   it('throws when removing non-existent drone', () => {
-    expect(() => removeDrone('nonexistent', tmpDir)).toThrow('not installed');
+    expect(() => removeDrone('nonexistent', tmpDir)).toThrow('not in fleet');
   });
 });

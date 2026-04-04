@@ -9,7 +9,7 @@ describe('analyzeMission', () => {
   let tmpDir: string;
 
   beforeEach(() => {
-    tmpDir = fs.mkdtempSync(path.join(os.tmpdir(), 'swarm-analyze-'));
+    tmpDir = fs.mkdtempSync(path.join(os.tmpdir(), 'mctl-analyze-'));
     fs.writeFileSync(path.join(tmpDir, 'package.json'), JSON.stringify({
       devDependencies: { typescript: '5.0.0', vitest: '1.0.0' },
     }));

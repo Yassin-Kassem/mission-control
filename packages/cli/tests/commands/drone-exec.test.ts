@@ -9,7 +9,7 @@ describe('execDrone', () => {
   let tmpDir: string;
 
   beforeEach(() => {
-    tmpDir = fs.mkdtempSync(path.join(os.tmpdir(), 'swarm-exec-'));
+    tmpDir = fs.mkdtempSync(path.join(os.tmpdir(), 'mctl-exec-'));
     fs.writeFileSync(path.join(tmpDir, 'package.json'), JSON.stringify({
       devDependencies: { vitest: '1.0.0' },
     }));

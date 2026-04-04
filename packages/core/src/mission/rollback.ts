@@ -4,13 +4,13 @@ export class MissionRollback {
   constructor(private projectDir: string) {}
 
   snapshot(missionId: string): string {
-    const tag = `swarm-pre-${missionId}`;
+    const tag = `mission-pre-${missionId}`;
     this.git(`tag ${tag}`);
     return tag;
   }
 
   rollback(missionId: string): void {
-    const tag = `swarm-pre-${missionId}`;
+    const tag = `mission-pre-${missionId}`;
     try {
       this.git(`rev-parse ${tag}`);
     } catch {
@@ -21,7 +21,7 @@ export class MissionRollback {
   }
 
   listSnapshots(): string[] {
-    const output = this.git('tag -l "swarm-pre-*"');
+    const output = this.git('tag -l "mission-pre-*"');
     return output.split('\n').filter((t) => t.length > 0);
   }
 

@@ -6,7 +6,7 @@ import os from 'os';
 
 describe('TesterExecutor', () => {
   let tmpDir: string;
-  beforeEach(() => { tmpDir = fs.mkdtempSync(path.join(os.tmpdir(), 'swarm-tester-')); });
+  beforeEach(() => { tmpDir = fs.mkdtempSync(path.join(os.tmpdir(), 'mctl-tester-')); });
   afterEach(() => { fs.rmSync(tmpDir, { recursive: true, force: true }); });
 
   it('detects test command from package.json', () => {

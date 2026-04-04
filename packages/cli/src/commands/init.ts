@@ -1,6 +1,6 @@
 import fs from 'fs';
 import path from 'path';
-import { DRONE_ASCII, colors, header, success, info, kv } from '../ui/theme.js';
+import { DRONE_ASCII, banner, separator, success, info, kv, sectionStart, sectionEnd, colors } from '../ui/theme.js';
 
 const DEFAULT_CONFIG = `# Mission Control Configuration
 # This file is meant to be committed to version control.
@@ -67,16 +67,24 @@ export function printInit(projectDir: string): void {
   initProject(projectDir);
 
   console.log(DRONE_ASCII);
-  console.log(header('INITIALIZED'));
+  console.log(banner('S Y S T E M   O N L I N E'));
   console.log('');
-  console.log(success('Mission Control is ready.'));
+
+  console.log(sectionStart('DEPLOYMENT'));
+  console.log(kv('Config', colors.text('.mctl/config.yaml')));
+  console.log(kv('Memory', colors.text('.mctl/memory.db')));
+  console.log(kv('Drones', colors.bright('8') + colors.text(' deployed')));
+  console.log(kv('Plan', colors.text('pro') + colors.muted(' (mission config set-plan to change)')));
+  console.log(sectionEnd());
+
   console.log('');
-  console.log(kv('Config', '.mctl/config.yaml'));
-  console.log(kv('Memory', '.mctl/memory.db'));
-  console.log(kv('Drones', '8 built-in'));
-  console.log(kv('Plan', 'pro (change with: mission config set-plan)'));
+  console.log(separator());
   console.log('');
-  console.log(info(`Run ${colors.bright('mission run "your task"')} to start a mission`));
-  console.log(info(`Run ${colors.bright('mission drone create <name>')} to build a custom drone`));
+
+  console.log(success('All systems operational. Awaiting orders.'));
+  console.log('');
+  console.log(info(`${colors.bright('mission run "your task"')} ${colors.muted('— launch a mission')}`));
+  console.log(info(`${colors.bright('mission drone create <name>')} ${colors.muted('— build a custom drone')}`));
+  console.log(info(`${colors.bright('mission status')} ${colors.muted('— check swarm status')}`));
   console.log('');
 }

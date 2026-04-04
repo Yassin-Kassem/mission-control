@@ -1,7 +1,7 @@
 {
-  "name": "@swarm/core",
+  "name": "@mctl/core",
   "version": "0.0.1",
-  "description": "Swarm framework core engine",
+  "description": "Mission Control core engine",
   "type": "module",
   "main": "dist/index.js",
   "types": "dist/index.d.ts",

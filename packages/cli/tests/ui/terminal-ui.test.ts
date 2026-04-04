@@ -1,6 +1,6 @@
 import { describe, it, expect, beforeEach } from 'vitest';
 import { TerminalUI } from '../../src/ui/terminal-ui.js';
-import { SignalBus, createSignal } from '@swarm/core';
+import { SignalBus, createSignal } from '@mctl/core';
 
 describe('TerminalUI', () => {
   let bus: SignalBus;
@@ -25,7 +25,7 @@ describe('TerminalUI', () => {
     const ui = createUI(['scout', 'coder']);
     ui.render();
     const frame = output.join('');
-    expect(frame).toContain('SWARM');
+    expect(frame).toContain('MISSION CONTROL');
     expect(frame).toContain('test mission');
     expect(frame).toContain('scout');
     expect(frame).toContain('coder');

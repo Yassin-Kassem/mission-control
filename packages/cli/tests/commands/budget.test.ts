@@ -2,7 +2,7 @@ import { describe, it, expect, beforeEach, afterEach } from 'vitest';
 import { getMissionBudget } from '../../src/commands/budget.js';
 import { initProject } from '../../src/commands/init.js';
 import { loadProjectContext } from '../../src/context.js';
-import { createSignal } from '@swarm/core';
+import { createSignal } from '@mctl/core';
 import fs from 'fs';
 import path from 'path';
 import os from 'os';
@@ -10,7 +10,7 @@ import os from 'os';
 describe('getMissionBudget', () => {
   let tmpDir: string;
   beforeEach(() => {
-    tmpDir = fs.mkdtempSync(path.join(os.tmpdir(), 'swarm-budget-'));
+    tmpDir = fs.mkdtempSync(path.join(os.tmpdir(), 'mctl-budget-'));
     fs.writeFileSync(path.join(tmpDir, 'package.json'), '{}');
     initProject(tmpDir);
   });

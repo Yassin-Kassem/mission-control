@@ -9,7 +9,7 @@ describe('runMission (integration)', () => {
   let tmpDir: string;
 
   beforeEach(() => {
-    tmpDir = fs.mkdtempSync(path.join(os.tmpdir(), 'swarm-e2e-'));
+    tmpDir = fs.mkdtempSync(path.join(os.tmpdir(), 'mctl-e2e-'));
     fs.writeFileSync(path.join(tmpDir, 'package.json'), JSON.stringify({
       name: 'test-project',
       devDependencies: { typescript: '5.0.0', vitest: '1.0.0' },
@@ -26,7 +26,7 @@ describe('runMission (integration)', () => {
 
   it('runs a trivial mission end-to-end', async () => {
     await runMission('fix a typo', tmpDir, { noDashboard: true });
-    const dbPath = path.join(tmpDir, '.swarm', 'memory.db');
+    const dbPath = path.join(tmpDir, '.mctl', 'memory.db');
     expect(fs.existsSync(dbPath)).toBe(true);
   });
 
@@ -36,7 +36,7 @@ describe('runMission (integration)', () => {
       tmpDir,
       { noDashboard: true },
     );
-    const dbPath = path.join(tmpDir, '.swarm', 'memory.db');
+    const dbPath = path.join(tmpDir, '.mctl', 'memory.db');
     expect(fs.existsSync(dbPath)).toBe(true);
   });
 });

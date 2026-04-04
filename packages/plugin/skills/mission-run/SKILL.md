@@ -1,27 +1,27 @@
 ---
-name: swarm-run
-description: Use when the user asks to build, fix, debug, refactor, or deploy something and wants orchestrated multi-drone execution with the swarm framework
+name: mission-run
+description: Use when the user asks to build, fix, debug, refactor, or deploy something and wants orchestrated multi-drone execution with the Mission Control framework
 ---
 
-# Swarm Mission Runner
+# Mission Control Runner
 
-Orchestrate a mission with the Swarm framework. AI drones run as isolated subagents. Communication is through `.swarm/mission/` files. You (parent) stay lean — dispatch, collect one-line status, report.
+Orchestrate a mission with the Mission Control framework. AI drones run as isolated subagents. Communication is through `.mctl/mission/` files. You (parent) stay lean — dispatch, collect one-line status, report.
 
-## How to Run Swarm Commands
+## How to Run Mission Control Commands
 
 ```bash
-SWARM="bash ${CLAUDE_PLUGIN_ROOT}/bin/swarm"
+MISSION="bash ${CLAUDE_PLUGIN_ROOT}/bin/mission"
 ```
 
-Fallback: `SWARM="bash $(find ~/.claude/plugins -path '*/swarm/bin/swarm' -print -quit 2>/dev/null)"`
+Fallback: `MISSION="bash $(find ~/.claude/plugins -path '*/mission-control/bin/mission' -print -quit 2>/dev/null)"`
 
-**NEVER:** `npx swarm`, `node .../bin/swarm`, `swarm` directly.
+**NEVER:** `npx mission`, `node .../bin/mission`, `mission` directly.
 
 ## Step 1: Analyze + Mode Selection
 
 ```bash
-$SWARM analyze "$ARGUMENTS" --mode copilot > .swarm/mission/analysis.json
-mkdir -p .swarm/mission
+$MISSION analyze "$ARGUMENTS" --mode copilot > .mctl/mission/analysis.json
+mkdir -p .mctl/mission
 ```
 
 Parse the JSON. Present to user:
@@ -42,15 +42,15 @@ Default to **copilot**. For **trivial/small scope**, force **solo**.
 ## Step 2: Pre-Mission Snapshot
 
 ```bash
-git tag "swarm-pre-$(cat .swarm/mission/analysis.json | grep missionId | head -1 | sed 's/.*: "//;s/".*//')" 2>/dev/null || true
+git tag "mission-pre-$(cat .mctl/mission/analysis.json | grep missionId | head -1 | sed 's/.*: "//;s/".*//')" 2>/dev/null || true
 ```
 
-Creates a rollback point. User can undo everything with `swarm rollback <mission-id>`.
+Creates a rollback point. User can undo everything with `mission rollback <mission-id>`.
 
 ## Step 3: Check Memory
 
 ```bash
-$SWARM memory show 2>/dev/null
+$MISSION memory show 2>/dev/null
 ```
 
 If memory has project info (languages, frameworks, past corrections), include relevant entries in subagent prompts. This makes drones smarter on repeat missions.
@@ -58,7 +58,7 @@ If memory has project info (languages, frameworks, past corrections), include re
 ## Step 4: Scout (tool — zero tokens)
 
 ```bash
-$SWARM drone exec scout > .swarm/mission/scout.json
+$MISSION drone exec scout > .mctl/mission/scout.json
 ```
 
 ## Step 5: Architect + Plan (subagent)
@@ -70,17 +70,17 @@ Agent tool:
   description: "Architect drone: design + plan"
   model: sonnet
   prompt: |
-    You are the Architect drone for a swarm mission.
+    You are the Architect drone for a Mission Control mission.
     TASK: $ARGUMENTS
 
-    Read .swarm/mission/scout.json for project context.
+    Read .mctl/mission/scout.json for project context.
 
     Your job:
     1. Read scout results to understand the project
     2. Design the solution (approach, file structure, data flow)
     3. Write a step-by-step implementation plan with exact file paths
 
-    Write to .swarm/mission/plan.md:
+    Write to .mctl/mission/plan.md:
     ## Design
     [2-3 sentences on approach]
 
@@ -93,10 +93,10 @@ Agent tool:
     - Create: [paths]
     - Modify: [paths]
 
-    Report: "Plan written to .swarm/mission/plan.md" + one-line summary.
+    Report: "Plan written to .mctl/mission/plan.md" + one-line summary.
 ```
 
-**Copilot/Step-by-step:** Read `.swarm/mission/plan.md`, show to user, wait for approval.
+**Copilot/Step-by-step:** Read `.mctl/mission/plan.md`, show to user, wait for approval.
 **Autopilot/Blitz:** Continue immediately.
 
 ## Step 6: Coder (subagent)
@@ -106,12 +106,12 @@ Agent tool:
   description: "Coder drone: implement plan"
   model: sonnet
   prompt: |
-    You are the Coder drone for a swarm mission.
+    You are the Coder drone for a Mission Control mission.
     TASK: $ARGUMENTS
 
     Read:
-    - .swarm/mission/scout.json (project structure)
-    - .swarm/mission/plan.md (plan to follow exactly)
+    - .mctl/mission/scout.json (project structure)
+    - .mctl/mission/plan.md (plan to follow exactly)
 
     Follow the plan step by step. Write clean code. Match existing patterns.
     Write tests alongside code. Commit after each logical unit.
@@ -121,7 +121,7 @@ Agent tool:
     - Root files: `pnpm exec vitest run tests/<file>.test.ts`
     - NEVER: npx vitest, turbo test, node_modules/.bin/vitest
 
-    Write summary to .swarm/mission/coder.md:
+    Write summary to .mctl/mission/coder.md:
     ## Changes
     - [file]: [what changed]
     ## Tests
@@ -135,7 +135,7 @@ Agent tool:
 ## Step 7: Test + Self-Healing Loop
 
 ```bash
-$SWARM drone exec tester > .swarm/mission/tester.json
+$MISSION drone exec tester > .mctl/mission/tester.json
 ```
 
 **If tests fail (max 2 retries):**
@@ -146,19 +146,19 @@ Agent tool:
   model: sonnet
   prompt: |
     Tests are failing. Read:
-    - .swarm/mission/tester.json (test output)
-    - .swarm/mission/coder.md (what was changed)
+    - .mctl/mission/tester.json (test output)
+    - .mctl/mission/coder.md (what was changed)
 
     Fix the issues. Test with: `pnpm test` or `pnpm exec vitest run tests/<file>.test.ts`
     Report: what was wrong + what you fixed.
 ```
 
-Re-run `$SWARM drone exec tester` after each fix. If still failing after 2 retries, report to user.
+Re-run `$MISSION drone exec tester` after each fix. If still failing after 2 retries, report to user.
 
 ## Step 8: Security (tool)
 
 ```bash
-$SWARM drone exec security > .swarm/mission/security.json
+$MISSION drone exec security > .mctl/mission/security.json
 ```
 
 ## Step 9: Review + Self-Healing Loop
@@ -169,12 +169,12 @@ Agent tool:
   model: haiku
   prompt: |
     Review code changes for this mission. Read:
-    - .swarm/mission/plan.md (intended design)
-    - .swarm/mission/coder.md (what was implemented)
+    - .mctl/mission/plan.md (intended design)
+    - .mctl/mission/coder.md (what was implemented)
     Run `git diff HEAD~5` to see actual changes.
 
     Check: design match, edge cases, security, quality.
-    Write to .swarm/mission/reviewer.md.
+    Write to .mctl/mission/reviewer.md.
     Report: "clean" or list of issues.
 ```
 
@@ -185,13 +185,13 @@ Agent tool:
   description: "Fix review issues"
   model: sonnet
   prompt: |
-    Reviewer found issues. Read .swarm/mission/reviewer.md.
+    Reviewer found issues. Read .mctl/mission/reviewer.md.
     Fix each issue. Report what you fixed.
 ```
 
 ## Step 10: Learn + Report
 
-The swarm learns from every mission. After completion, key findings get stored in memory for future missions.
+Mission Control learns from every mission. After completion, key findings get stored in memory for future missions.
 
 Report to user:
 
@@ -205,11 +205,11 @@ Report to user:
 | security  | N vulnerabilities                 |
 | reviewer  | [clean or findings]               |
 
-Snapshot: swarm-pre-[id] (swarm rollback [id] to undo)
+Snapshot: mission-pre-[id] (mission rollback [id] to undo)
 ```
 
 **If mission had failures:**
-> Some drones had issues. Run `swarm rollback [mission-id]` to undo all changes?
+> Some drones had issues. Run `mission rollback [mission-id]` to undo all changes?
 
 ## Mode Behavior Summary
 
@@ -225,7 +225,7 @@ Snapshot: swarm-pre-[id] (swarm rollback [id] to undo)
 
 1. Parent stays lean — dispatch + collect one-line status
 2. Subagents read files themselves, parent NEVER reads full file contents
-3. Communication via `.swarm/mission/` files only
+3. Communication via `.mctl/mission/` files only
 4. Model selection: architect/coder=sonnet, reviewer/docs=haiku, debugger=opus
 5. Trivial/small = solo mode, zero subagent overhead
 6. Max 4 AI subagents per mission

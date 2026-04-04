@@ -1,8 +1,8 @@
 node_modules/
 dist/
 *.tsbuildinfo
-.swarm/memory.db
-.swarm/checkpoints/
+.mctl/memory.db
+.mctl/checkpoints/
 .env
 .env.local
 coverage/

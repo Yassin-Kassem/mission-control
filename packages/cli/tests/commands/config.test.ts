@@ -8,7 +8,7 @@ import os from 'os';
 describe('getConfig', () => {
   let tmpDir: string;
   beforeEach(() => {
-    tmpDir = fs.mkdtempSync(path.join(os.tmpdir(), 'swarm-config-'));
+    tmpDir = fs.mkdtempSync(path.join(os.tmpdir(), 'mctl-config-'));
     initProject(tmpDir);
   });
   afterEach(() => { fs.rmSync(tmpDir, { recursive: true, force: true }); });
@@ -20,7 +20,7 @@ describe('getConfig', () => {
   });
 
   it('throws if not initialized', () => {
-    const emptyDir = fs.mkdtempSync(path.join(os.tmpdir(), 'swarm-empty-'));
+    const emptyDir = fs.mkdtempSync(path.join(os.tmpdir(), 'mctl-empty-'));
     expect(() => getConfig(emptyDir)).toThrow();
     fs.rmSync(emptyDir, { recursive: true, force: true });
   });

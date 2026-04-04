@@ -1,6 +1,6 @@
 import { describe, it, expect, vi } from 'vitest';
 import { Broadcaster } from '../../src/dashboard/broadcaster.js';
-import { SignalBus, createSignal } from '@swarm/core';
+import { SignalBus, createSignal } from '@mctl/core';
 
 describe('Broadcaster', () => {
   it('relays signals to registered listeners', () => {

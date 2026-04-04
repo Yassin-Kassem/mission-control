@@ -8,7 +8,7 @@ import os from 'os';
 describe('rollback commands', () => {
   let tmpDir: string;
   beforeEach(() => {
-    tmpDir = fs.mkdtempSync(path.join(os.tmpdir(), 'swarm-rb-cmd-'));
+    tmpDir = fs.mkdtempSync(path.join(os.tmpdir(), 'mctl-rb-cmd-'));
     execSync('git init', { cwd: tmpDir });
     execSync('git config user.email "test@test.com"', { cwd: tmpDir });
     execSync('git config user.name "Test"', { cwd: tmpDir });
@@ -20,7 +20,7 @@ describe('rollback commands', () => {
   it('creates and lists snapshots', () => {
     createSnapshot('m1', tmpDir);
     const snaps = listSnapshots(tmpDir);
-    expect(snaps).toContain('swarm-pre-m1');
+    expect(snaps).toContain('mission-pre-m1');
   });
 
   it('rolls back changes', () => {

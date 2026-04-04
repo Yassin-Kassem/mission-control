@@ -1,5 +1,5 @@
 import chalk from 'chalk';
-import type { SignalBus, Signal } from '@swarm/core';
+import type { SignalBus, Signal } from '@mctl/core';
 import { type DroneDisplayState, renderDronePanelColored } from './drone-panel.js';
 import { formatDuration } from '../format.js';
 
@@ -63,7 +63,7 @@ export class TerminalUI {
     const w = this.width;
     const inner = w - 2;
 
-    const title = ' SWARM ';
+    const title = ' MISSION CONTROL ';
     const topPad = Math.max(0, inner - title.length - 1);
     lines.push(`┌${title}${'─'.repeat(topPad)}┐`);
 

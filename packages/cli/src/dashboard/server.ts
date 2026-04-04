@@ -1,6 +1,6 @@
 import http from 'http';
 import { WebSocketServer, type WebSocket } from 'ws';
-import type { SignalBus } from '@swarm/core';
+import type { SignalBus } from '@mctl/core';
 import { Broadcaster } from './broadcaster.js';
 
 export interface DashboardServerOptions {

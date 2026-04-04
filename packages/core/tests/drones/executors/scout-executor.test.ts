@@ -8,7 +8,7 @@ describe('ScoutExecutor', () => {
   let tmpDir: string;
 
   beforeEach(() => {
-    tmpDir = fs.mkdtempSync(path.join(os.tmpdir(), 'swarm-scout-'));
+    tmpDir = fs.mkdtempSync(path.join(os.tmpdir(), 'mctl-scout-'));
     fs.mkdirSync(path.join(tmpDir, 'src'));
     fs.writeFileSync(path.join(tmpDir, 'package.json'), JSON.stringify({
       dependencies: { express: '4.0.0' },

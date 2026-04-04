@@ -9,7 +9,7 @@ import os from 'os';
 describe('getStatus', () => {
   let tmpDir: string;
   beforeEach(() => {
-    tmpDir = fs.mkdtempSync(path.join(os.tmpdir(), 'swarm-status-'));
+    tmpDir = fs.mkdtempSync(path.join(os.tmpdir(), 'mctl-status-'));
     fs.writeFileSync(path.join(tmpDir, 'package.json'), '{}');
     initProject(tmpDir);
   });

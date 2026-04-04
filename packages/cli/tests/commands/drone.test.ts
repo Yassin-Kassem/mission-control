@@ -8,7 +8,7 @@ import os from 'os';
 describe('listDrones', () => {
   let tmpDir: string;
   beforeEach(() => {
-    tmpDir = fs.mkdtempSync(path.join(os.tmpdir(), 'swarm-drone-'));
+    tmpDir = fs.mkdtempSync(path.join(os.tmpdir(), 'mctl-drone-'));
     fs.writeFileSync(path.join(tmpDir, 'package.json'), '{}');
     initProject(tmpDir);
   });
@@ -35,7 +35,7 @@ describe('listDrones', () => {
 describe('getDroneInfo', () => {
   let tmpDir: string;
   beforeEach(() => {
-    tmpDir = fs.mkdtempSync(path.join(os.tmpdir(), 'swarm-drone-info-'));
+    tmpDir = fs.mkdtempSync(path.join(os.tmpdir(), 'mctl-drone-info-'));
     fs.writeFileSync(path.join(tmpDir, 'package.json'), '{}');
     initProject(tmpDir);
   });

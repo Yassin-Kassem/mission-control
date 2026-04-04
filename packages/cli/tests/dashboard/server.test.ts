@@ -1,6 +1,6 @@
 import { describe, it, expect, afterEach } from 'vitest';
 import { DashboardServer } from '../../src/dashboard/server.js';
-import { SignalBus } from '@swarm/core';
+import { SignalBus } from '@mctl/core';
 
 describe('DashboardServer', () => {
   let server: DashboardServer;
