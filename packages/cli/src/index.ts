@@ -13,6 +13,8 @@ import { printConfig } from './commands/config.js';
 import { printAnalysis } from './commands/analyze.js';
 import { printBudget } from './commands/budget.js';
 import { rollbackMission as doRollback, printSnapshots } from './commands/rollback.js';
+import fs from 'fs';
+import path from 'path';
 
 const program = new Command();
 
@@ -170,8 +172,6 @@ configCmd
       console.error(`Invalid plan "${plan}". Options: ${valid.join(', ')}`);
       process.exit(1);
     }
-    const fs = require('fs');
-    const path = require('path');
     const configPath = path.join(dir, '.mctl', 'config.yaml');
     if (!fs.existsSync(configPath)) {
       console.error('Project not initialized. Run `mission init` first.');
