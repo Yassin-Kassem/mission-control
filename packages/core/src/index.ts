@@ -30,6 +30,9 @@ export { MissionStore } from './mission/mission-store.js';
 export { MissionPlanner, type MissionPlan, type PlanStep } from './mission/mission-planner.js';
 export { MissionRunner, type MissionRunnerConfig, type MissionResult } from './mission/mission-runner.js';
 
+// Executors
+export { ScoutExecutor } from './drones/executors/scout-executor.js';
+
 // Recovery
 export { type Checkpoint, type CheckpointData } from './recovery/checkpoint.js';
 export { CheckpointManager } from './recovery/checkpoint-manager.js';
