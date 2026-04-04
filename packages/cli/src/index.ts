@@ -9,6 +9,7 @@ import { printReplay } from './commands/replay.js';
 import { printDroneList, printDroneInfo } from './commands/drone.js';
 import { printMemory, promoteMemory, forgetMemory } from './commands/memory.js';
 import { printConfig } from './commands/config.js';
+import { printAnalysis } from './commands/analyze.js';
 
 const program = new Command();
 
@@ -140,6 +141,14 @@ configCmd
   .argument('[dir]', 'Project directory', process.cwd())
   .action((dir: string) => {
     printConfig(dir);
+  });
+
+program
+  .command('analyze')
+  .description('Analyze a task and output structured plan (JSON)')
+  .argument('<description>', 'Task description')
+  .action((description: string) => {
+    printAnalysis(description, process.cwd());
   });
 
 program.parse();
