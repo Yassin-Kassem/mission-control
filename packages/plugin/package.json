@@ -1,0 +1,6 @@
+{
+  "name": "@swarm/claude-code-plugin",
+  "version": "0.0.1",
+  "description": "Swarm framework Claude Code plugin",
+  "private": true
+}
