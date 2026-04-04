@@ -1,0 +1,5 @@
+#!/usr/bin/env bash
+# Swarm CLI — routes to the built CLI package
+PLUGIN_DIR="$(cd "$(dirname "$0")/.." && pwd)"
+REPO_ROOT="$(cd "$PLUGIN_DIR/.." && pwd)"
+exec node "$REPO_ROOT/cli/dist/index.js" "$@"
