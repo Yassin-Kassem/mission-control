@@ -35,6 +35,9 @@ export { ScoutExecutor } from './drones/executors/scout-executor.js';
 export { TesterExecutor } from './drones/executors/tester-executor.js';
 export { SecurityExecutor } from './drones/executors/security-executor.js';
 
+// Token Tracker
+export { TokenTracker, type TokenEstimate, type TokenUsage, type DroneTokenEstimate } from './mission/token-tracker.js';
+
 // Recovery
 export { type Checkpoint, type CheckpointData } from './recovery/checkpoint.js';
 export { CheckpointManager } from './recovery/checkpoint-manager.js';
