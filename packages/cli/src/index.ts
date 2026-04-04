@@ -216,4 +216,14 @@ program
     printSnapshots(process.cwd());
   });
 
+// Global error handler — graceful messages instead of stack traces
+process.on('uncaughtException', (err) => {
+  if (err.message?.includes('not initialized')) {
+    console.error(`Error: ${err.message}`);
+  } else {
+    console.error(`Error: ${err.message}`);
+  }
+  process.exit(1);
+});
+
 program.parse();
