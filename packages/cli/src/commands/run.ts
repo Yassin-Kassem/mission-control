@@ -1,4 +1,4 @@
-import { createMissionId, MissionRunner, type DroneExecutor } from '@swarm/core';
+import { createMissionId, MissionRunner, type DroneExecutor, ScoutExecutor, TesterExecutor, SecurityExecutor } from '@swarm/core';
 import { DashboardServer } from '../dashboard/server.js';
 import { loadProjectContext } from '../context.js';
 import { TerminalUI } from '../ui/terminal-ui.js';
@@ -57,14 +57,25 @@ export async function runMission(description: string, projectDir: string, option
   const runner = new MissionRunner({
     bus: ctx.bus, memory: ctx.memory, missionStore: ctx.missionStore,
     checkpoints: ctx.checkpoints, planner: ctx.planner,
-    resolveExecutor: (_name: string): DroneExecutor => ({
-      async execute() {
-        // Simulate work — real drones will replace this
-        const delay = 300 + Math.random() * 500;
-        await new Promise((resolve) => setTimeout(resolve, delay));
-        return { summary: `${_name} completed (placeholder)` };
-      },
-    }),
+    resolveExecutor: (droneName: string): DroneExecutor => {
+      switch (droneName) {
+        case 'scout':
+          return new ScoutExecutor(projectDir);
+        case 'tester':
+          return new TesterExecutor(projectDir);
+        case 'security':
+          return new SecurityExecutor(projectDir);
+        default:
+          // AI drones use placeholder when running outside Claude Code
+          return {
+            async execute() {
+              const delay = 300 + Math.random() * 500;
+              await new Promise((resolve) => setTimeout(resolve, delay));
+              return { summary: `${droneName} requires Claude Code for full execution` };
+            },
+          };
+      }
+    },
   });
 
   const result = await runner.run(missionId, description, drones);
