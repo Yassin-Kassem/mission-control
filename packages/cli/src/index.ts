@@ -6,7 +6,7 @@ import { runMission } from './commands/run.js';
 import { printStatus } from './commands/status.js';
 import { printHistory } from './commands/history.js';
 import { printReplay } from './commands/replay.js';
-import { printDroneList, printDroneInfo } from './commands/drone.js';
+import { printDroneList, printDroneInfo, scaffoldNewDrone } from './commands/drone.js';
 import { printDroneExec } from './commands/drone-exec.js';
 import { printMemory, promoteMemory, forgetMemory } from './commands/memory.js';
 import { printConfig } from './commands/config.js';
@@ -98,6 +98,20 @@ droneCmd
   .argument('[dir]', 'Project directory', process.cwd())
   .action((name: string, dir: string) => {
     printDroneInfo(dir, name);
+  });
+
+droneCmd
+  .command('create')
+  .description('Scaffold a new custom drone')
+  .argument('<name>', 'Drone name (kebab-case)')
+  .argument('[dir]', 'Target directory', process.cwd())
+  .action((name: string, dir: string) => {
+    try {
+      scaffoldNewDrone(name, dir);
+    } catch (err) {
+      console.error((err as Error).message);
+      process.exit(1);
+    }
   });
 
 droneCmd

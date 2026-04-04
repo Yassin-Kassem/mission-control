@@ -1,4 +1,5 @@
-import { type DroneManifest } from '@swarm/core';
+import { type DroneManifest } from '@mctl/core';
+import { scaffoldDrone as doScaffold } from '@mctl/sdk';
 import chalk from 'chalk';
 import { loadProjectContext } from '../context.js';
 
@@ -82,6 +83,18 @@ export function printDroneInfo(projectDir: string, name: string): void {
 
   lines.push(bot(inner));
   console.log(lines.join('\n'));
+}
+
+export function scaffoldNewDrone(name: string, targetDir: string): void {
+  const files = doScaffold(name, targetDir);
+  console.log(`Drone "${name}" created with ${files.length} files:`);
+  for (const f of files) {
+    console.log(`  ${name}/${f}`);
+  }
+  console.log(`\nNext steps:`);
+  console.log(`  1. Edit ${name}/drone.yaml to configure triggers and signals`);
+  console.log(`  2. Edit ${name}/skills/main.md to define drone behavior`);
+  console.log(`  3. Run tests: cd ${name} && npx vitest run`);
 }
 
 function fit(str: string, width: number): string {
