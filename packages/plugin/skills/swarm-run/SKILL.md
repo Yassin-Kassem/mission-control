@@ -5,90 +5,82 @@ description: Use when the user asks to build, fix, debug, refactor, or deploy so
 
 # Swarm Mission Runner
 
-Orchestrate a mission using the Swarm framework. Each AI drone runs as an isolated subagent with its own fresh context. Drones communicate through files in `.swarm/mission/`, not through the parent context. The parent (you) stays lean — dispatch, collect status, report.
+Orchestrate a mission with the Swarm framework. AI drones run as isolated subagents. Communication is through `.swarm/mission/` files. You (parent) stay lean — dispatch, collect one-line status, report.
 
-## CRITICAL: How to Run Swarm Commands
+## How to Run Swarm Commands
 
+```bash
+SWARM="bash ${CLAUDE_PLUGIN_ROOT}/bin/swarm"
 ```
-bash "${CLAUDE_PLUGIN_ROOT}/bin/swarm" <command> [args]
-```
+
+Fallback: `SWARM="bash $(find ~/.claude/plugins -path '*/swarm/bin/swarm' -print -quit 2>/dev/null)"`
 
 **NEVER:** `npx swarm`, `node .../bin/swarm`, `swarm` directly.
 
-Fallback if `CLAUDE_PLUGIN_ROOT` is unset:
-```bash
-SWARM_ROOT="$(find ~/.claude/plugins -path '*/swarm/bin/swarm' -print -quit 2>/dev/null | xargs dirname | xargs dirname)"
-SWARM="bash ${CLAUDE_PLUGIN_ROOT:-$SWARM_ROOT}/bin/swarm"
-```
-
-## Process
-
-```dot
-digraph swarm {
-    "1. Analyze" [shape=box];
-    "2. Scout (tool)" [shape=box];
-    "3. Architect (subagent)" [shape=box];
-    "4. Write plan to file" [shape=box];
-    "5. Coder (subagent, follows plan)" [shape=box];
-    "6. Test (tool + subagent)" [shape=box];
-    "7. Review (subagent)" [shape=box];
-    "8. Report" [shape=box];
-
-    "1. Analyze" -> "2. Scout (tool)";
-    "2. Scout (tool)" -> "3. Architect (subagent)";
-    "3. Architect (subagent)" -> "4. Write plan to file";
-    "4. Write plan to file" -> "5. Coder (subagent, follows plan)";
-    "5. Coder (subagent, follows plan)" -> "6. Test (tool + subagent)";
-    "6. Test (tool + subagent)" -> "7. Review (subagent)";
-    "7. Review (subagent)" -> "8. Report";
-}
-```
-
-### Step 1: Analyze + Setup
+## Step 1: Analyze + Mode Selection
 
 ```bash
-$SWARM analyze "$ARGUMENTS"
+$SWARM analyze "$ARGUMENTS" --mode copilot > .swarm/mission/analysis.json
 mkdir -p .swarm/mission
 ```
 
-Parse the JSON. Save it:
+Parse the JSON. Present to user:
+
+> **Mission:** [description]
+> Intent: [intent] | Scope: [scope] | Est. tokens: [N] (~$[cost])
+> Drones: [list with type indicators]
+>
+> **Execution mode?**
+> 1. **Copilot** (default) — pauses after design + after coding for approval
+> 2. **Autopilot** — runs all drones, no stops
+> 3. **Step-by-step** — pauses after every drone
+> 4. **Blitz** — parallel independent drones, fastest
+> 5. **Solo** — no subagents, do everything inline
+
+Default to **copilot**. For **trivial/small scope**, force **solo**.
+
+## Step 2: Pre-Mission Snapshot
+
 ```bash
-$SWARM analyze "$ARGUMENTS" > .swarm/mission/analysis.json
+git tag "swarm-pre-$(cat .swarm/mission/analysis.json | grep missionId | head -1 | sed 's/.*: "//;s/".*//')" 2>/dev/null || true
 ```
 
-Tell the user: intent, scope, which drones activate.
+Creates a rollback point. User can undo everything with `swarm rollback <mission-id>`.
 
-### Step 2: Scout (tool drone — zero tokens)
+## Step 3: Check Memory
+
+```bash
+$SWARM memory show 2>/dev/null
+```
+
+If memory has project info (languages, frameworks, past corrections), include relevant entries in subagent prompts. This makes drones smarter on repeat missions.
+
+## Step 4: Scout (tool — zero tokens)
 
 ```bash
 $SWARM drone exec scout > .swarm/mission/scout.json
 ```
 
-This scans the project and writes results to a file that all subsequent drones will read.
+## Step 5: Architect + Plan (subagent)
 
-### Step 3: Architect (subagent)
-
-**For trivial/small scope:** Skip this. Go straight to coder.
-
-**For medium+ scope:** Dispatch an architect subagent:
+**Skip for solo mode or trivial/small scope.**
 
 ```
 Agent tool:
-  description: "Architect drone: design solution"
+  description: "Architect drone: design + plan"
   model: sonnet
   prompt: |
     You are the Architect drone for a swarm mission.
-
     TASK: $ARGUMENTS
 
     Read .swarm/mission/scout.json for project context.
 
     Your job:
-    1. Read the scout results to understand the project structure
-    2. Design the solution — what files to create/modify, what approach to take
-    3. Write a step-by-step implementation plan with exact file paths and code
+    1. Read scout results to understand the project
+    2. Design the solution (approach, file structure, data flow)
+    3. Write a step-by-step implementation plan with exact file paths
 
-    Write your design to .swarm/mission/architect.md with this structure:
+    Write to .swarm/mission/plan.md:
     ## Design
     [2-3 sentences on approach]
 
@@ -101,161 +93,145 @@ Agent tool:
     - Create: [paths]
     - Modify: [paths]
 
-    Keep it concise. The coder will follow this exactly.
-
-    Report back: "Design written to .swarm/mission/architect.md" + one-line summary.
+    Report: "Plan written to .swarm/mission/plan.md" + one-line summary.
 ```
 
-**After architect returns:** Read `.swarm/mission/architect.md` and show the design to the user. Get approval before proceeding.
+**Copilot/Step-by-step:** Read `.swarm/mission/plan.md`, show to user, wait for approval.
+**Autopilot/Blitz:** Continue immediately.
 
-### Step 4: Coder (subagent)
-
-Dispatch a coder subagent that follows the plan:
+## Step 6: Coder (subagent)
 
 ```
 Agent tool:
-  description: "Coder drone: implement solution"
+  description: "Coder drone: implement plan"
   model: sonnet
   prompt: |
     You are the Coder drone for a swarm mission.
-
     TASK: $ARGUMENTS
 
-    Read these files for context:
+    Read:
     - .swarm/mission/scout.json (project structure)
-    - .swarm/mission/architect.md (design + plan to follow)
+    - .swarm/mission/plan.md (plan to follow exactly)
 
-    Your job:
-    1. Follow the plan in architect.md step by step
-    2. Write clean code matching existing project patterns
-    3. Write tests alongside your code (TDD if the project uses tests)
-    4. Commit after each logical unit of work
+    Follow the plan step by step. Write clean code. Match existing patterns.
+    Write tests alongside code. Commit after each logical unit.
 
-    Running tests in this project:
+    Test commands:
     - Package files: `pnpm test`
-    - Root-level files: `pnpm exec vitest run tests/<file>.test.ts`
-    - NEVER use: npx vitest, turbo test, node_modules/.bin/vitest
+    - Root files: `pnpm exec vitest run tests/<file>.test.ts`
+    - NEVER: npx vitest, turbo test, node_modules/.bin/vitest
 
-    Write a summary to .swarm/mission/coder.md:
+    Write summary to .swarm/mission/coder.md:
     ## Changes
     - [file]: [what changed]
-
     ## Tests
-    - [test file]: [what it tests]
+    - [test]: [what it tests]
 
-    Report back: "Implementation complete" + files changed list.
+    Report: "Implementation complete" + files changed.
 ```
 
-### Step 5: Test (tool drone + verification)
+**Copilot:** Show changes summary to user after coder finishes.
 
-Run the tool tester first:
+## Step 7: Test + Self-Healing Loop
+
 ```bash
 $SWARM drone exec tester > .swarm/mission/tester.json
 ```
 
-If tests fail, dispatch a fix subagent:
+**If tests fail (max 2 retries):**
+
 ```
 Agent tool:
-  description: "Fix failing tests"
+  description: "Fix failing tests (attempt N/2)"
   model: sonnet
   prompt: |
     Tests are failing. Read:
     - .swarm/mission/tester.json (test output)
     - .swarm/mission/coder.md (what was changed)
 
-    Fix the failing tests. Run tests with:
-    - Package files: `pnpm test`
-    - Root files: `pnpm exec vitest run tests/<file>.test.ts`
-
-    Report: what was wrong and what you fixed.
+    Fix the issues. Test with: `pnpm test` or `pnpm exec vitest run tests/<file>.test.ts`
+    Report: what was wrong + what you fixed.
 ```
 
-### Step 6: Review (subagent)
+Re-run `$SWARM drone exec tester` after each fix. If still failing after 2 retries, report to user.
+
+## Step 8: Security (tool)
+
+```bash
+$SWARM drone exec security > .swarm/mission/security.json
+```
+
+## Step 9: Review + Self-Healing Loop
 
 ```
 Agent tool:
-  description: "Reviewer drone: final quality check"
+  description: "Reviewer drone: quality check"
   model: haiku
   prompt: |
-    You are the Reviewer drone. Review code changes for this mission.
-
-    Read:
-    - .swarm/mission/architect.md (intended design)
+    Review code changes for this mission. Read:
+    - .swarm/mission/plan.md (intended design)
     - .swarm/mission/coder.md (what was implemented)
+    Run `git diff HEAD~5` to see actual changes.
 
-    Run: `git diff HEAD~3` (or appropriate range) to see actual changes.
-
-    Check for:
-    - Does implementation match the design?
-    - Edge cases missed?
-    - Security issues?
-    - Code quality?
-
-    Write findings to .swarm/mission/reviewer.md.
-    Report: "Review complete" + one-line verdict (clean / issues found).
+    Check: design match, edge cases, security, quality.
+    Write to .swarm/mission/reviewer.md.
+    Report: "clean" or list of issues.
 ```
 
-### Step 7: Report
-
-Read all `.swarm/mission/*.md` files and summarize:
+**If issues found (max 1 retry):**
 
 ```
-| Drone     | Result                                    |
-|-----------|-------------------------------------------|
-| scout     | Scanned N files, detected [stack]         |
-| architect | Designed: [brief approach]                |
-| coder     | Created/modified [files]                  |
-| tester    | N/N tests passing                         |
-| reviewer  | [findings or "clean"]                     |
+Agent tool:
+  description: "Fix review issues"
+  model: sonnet
+  prompt: |
+    Reviewer found issues. Read .swarm/mission/reviewer.md.
+    Fix each issue. Report what you fixed.
 ```
 
-## Token Efficiency Rules
+## Step 10: Learn + Report
 
-**The parent (you) must stay lean.** Your only job is dispatch + collect.
+The swarm learns from every mission. After completion, key findings get stored in memory for future missions.
 
-1. **NEVER read full file contents in the parent.** Subagents read files themselves.
-2. **Subagent prompts are short** — task + file paths to read. Not full context.
-3. **Subagent results are short** — "done, wrote to X" + one-line summary. Not full code.
-4. **Communication is via `.swarm/mission/` files.** Drones read previous drone outputs from files, not from parent context.
-5. **Use the cheapest model that works:**
-   - architect: sonnet
-   - coder: sonnet
-   - debugger: opus (needs deep reasoning)
-   - reviewer: haiku (quick check)
-   - docs: haiku
-6. **Max 4 AI subagents per mission.** For trivial tasks, skip architect and reviewer.
-7. **For trivial/small scope:** Don't use subagents at all. Just do the work directly.
+Report to user:
 
-## Scope-Based Behavior
+```
+| Drone     | Result                            |
+|-----------|-----------------------------------|
+| scout     | Scanned N files                   |
+| architect | [approach summary]                |
+| coder     | Created/modified [files]          |
+| tester    | N/N tests passing                 |
+| security  | N vulnerabilities                 |
+| reviewer  | [clean or findings]               |
 
-| Scope | Drones | Subagents? |
-|-------|--------|-----------|
-| trivial | coder only | No — do it yourself |
-| small | scout → coder → tester | No — do it yourself |
-| medium | scout → architect → coder → tester → reviewer | Yes — subagents |
-| large | scout → architect → security → coder → tester → reviewer → docs | Yes — subagents |
+Snapshot: swarm-pre-[id] (swarm rollback [id] to undo)
+```
+
+**If mission had failures:**
+> Some drones had issues. Run `swarm rollback [mission-id]` to undo all changes?
+
+## Mode Behavior Summary
+
+| Mode | Architect pause | Coder pause | Self-heal | Subagents |
+|------|----------------|-------------|-----------|-----------|
+| Solo | - | - | No | No |
+| Copilot | Yes | Yes | Yes | Yes |
+| Autopilot | No | No | Yes | Yes |
+| Step-by-step | Yes (every drone) | Yes | Yes (ask) | Yes |
+| Blitz | No | No | Yes | Yes (parallel) |
+
+## Token Efficiency
+
+1. Parent stays lean — dispatch + collect one-line status
+2. Subagents read files themselves, parent NEVER reads full file contents
+3. Communication via `.swarm/mission/` files only
+4. Model selection: architect/coder=sonnet, reviewer/docs=haiku, debugger=opus
+5. Trivial/small = solo mode, zero subagent overhead
+6. Max 4 AI subagents per mission
 
 ## Running Tests
 
-**Package files** (packages/core/*, packages/cli/*):
-```bash
-pnpm test
-```
-
-**Root-level files** (src/*, tests/*):
-```bash
-pnpm exec vitest run tests/your-test.test.ts
-```
-
-**NEVER:** `npx vitest`, `vitest run`, `node_modules/.bin/vitest`, `turbo test`
-
-## Common Mistakes
-
-| Mistake | Fix |
-|---------|-----|
-| Using `npx swarm` | Use `bash "${CLAUDE_PLUGIN_ROOT}/bin/swarm"` |
-| Dumping full scout output into parent context | Save to file, let subagents read it |
-| Skipping the plan | Architect must write a plan. Coder follows it. |
-| Having subagents return full code | They write to files, return one-line status |
-| Using opus for simple tasks | Match model to complexity (see table) |
-| Running all drones for a typo fix | Trivial/small = do it yourself, no subagents |
+**Package files:** `pnpm test`
+**Root files:** `pnpm exec vitest run tests/<file>.test.ts`
+**NEVER:** `npx vitest`, `vitest run`, `turbo test`
