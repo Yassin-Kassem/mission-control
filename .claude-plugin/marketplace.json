@@ -1,0 +1,21 @@
+{
+  "$schema": "https://anthropic.com/claude-code/marketplace.schema.json",
+  "name": "mission-control",
+  "description": "Mission Control — adaptive AI orchestration framework with self-organizing drone swarms",
+  "owner": {
+    "name": "Yassin Kassem"
+  },
+  "plugins": [
+    {
+      "name": "mission-control",
+      "source": "./packages/plugin",
+      "version": "0.1.0",
+      "description": "Adaptive AI orchestration with drone swarms. Scales from solo mode for typos to full swarm planning for epics.",
+      "author": {
+        "name": "Yassin Kassem"
+      },
+      "homepage": "https://github.com/Yassin-Kassem/mission-control",
+      "category": "development"
+    }
+  ]
+}
